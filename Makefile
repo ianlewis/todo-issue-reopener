@@ -35,6 +35,21 @@ help: ## Shows all targets and help from the Makefile (this message).
 package-lock.json:
 	npm install
 
+.PHONY: action
+action: node_modules/.installed ## Builds the action.
+	rm -rf lib
+	npm run build
+
+.PHONY: package
+package: action ## Builds the distribution package.
+	rm -rf dist
+	npm run package
+
+.PHONY: clean
+clean: ## Deletes generated files.
+	# NOTE: dist is checked in so it's not deleted.
+	rm -rf lib node_modules coverage
+
 node_modules/.installed: package.json package-lock.json
 	npm ci
 	touch node_modules/.installed
@@ -98,11 +113,20 @@ yaml-format: node_modules/.installed ## Format YAML files.
 		); \
 		./node_modules/.bin/prettier --write $${files}
 
+## Testing
+#####################################################################
+
+.PHONY: unit-test
+unit-test: node_modules/.installed ## Runs all unit tests.
+	# NOTE: Make sure the package builds.
+	npm run build
+	npm run test
+
 ## Linters
 #####################################################################
 
 .PHONY: lint
-lint: yamllint actionlint markdownlint ## Run all linters.
+lint: yamllint actionlint markdownlint eslint ## Run all linters.
 
 .PHONY: actionlint
 actionlint: ## Runs the actionlint linter.
@@ -147,3 +171,34 @@ yamllint: ## Runs the yamllint linter.
 			extraargs="-f github"; \
 		fi; \
 		yamllint --strict -c .yamllint.yaml . $$extraargs
+
+.PHONY: eslint
+eslint: node_modules/.installed ## Runs eslint.
+	@set -e;\
+		if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
+			exit_code=0; \
+			while IFS="" read -r p && [ -n "$$p" ]; do \
+				file=$$(echo "$$p" | jq -c '.filePath // empty' | tr -d '"'); \
+				file=$$(realpath --relative-to "$(REPO_ROOT)" "$$file"); \
+				while IFS="" read -r m && [ -n "$$m" ]; do \
+					severity=$$(echo "$$m" | jq -c '.severity // empty' | tr -d '"'); \
+					line=$$(echo "$$m" | jq -c '.line // empty' | tr -d '"'); \
+					endline=$$(echo "$$m" | jq -c '.endLine // empty' | tr -d '"'); \
+					col=$$(echo "$$m" | jq -c '.column // empty' | tr -d '"'); \
+					endcol=$$(echo "$$m" | jq -c '.endColumn // empty' | tr -d '"'); \
+					message=$$(echo "$$m" | jq -c '.message // empty' | tr -d '"'); \
+					exit_code=1; \
+					case $$severity in \
+					"1") \
+						echo "::warning file=$${file},line=$${line},endLine=$${endline},col=$${col},endColumn=$${endcol}::$${message}"; \
+						;; \
+					"2") \
+						echo "::error file=$${file},line=$${line},endLine=$${endline},col=$${col},endColumn=$${endcol}::$${message}"; \
+						;; \
+					esac; \
+				done <<<$$(echo "$$p" | jq -c '.messages[]'); \
+			done <<<$$(./node_modules/.bin/eslint --max-warnings 0 -f json src/**/*.ts | jq -c '.[]'); \
+			exit "$${exit_code}"; \
+		else \
+			./node_modules/.bin/eslint --max-warnings 0 src/**/*.ts; \
+		fi
