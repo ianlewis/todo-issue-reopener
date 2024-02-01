@@ -365,6 +365,36 @@ describe("getTODOIssues", () => {
       },
     );
   });
+
+  it("handles path not in git repo", async () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "getTODOIssues_"));
+    const todosPath = path.join(tmpDir, "todos");
+    fs.writeFileSync(todosPath, "");
+
+    verifier.downloadAndVerifySLSA.mockResolvedValueOnce(todosPath);
+
+    const workspacePath = process.env.GITHUB_WORKSPACE as string;
+    const repoRoot = path.join(workspacePath, "checkout");
+
+    // git rev-parse --show-top-level
+    exec.getExecOutput.mockResolvedValueOnce({
+      exitCode: 128,
+      stdout: "",
+      stderr:
+        "fatal: not a git repository (or any of the parent directories): .git\n",
+    });
+
+    // todos
+    exec.getExecOutput.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: '{"path": "path/to/file.js", "label": "#123"}',
+      stderr: "",
+    });
+
+    await expect(
+      reopener.getTODOIssues(path.join(repoRoot, "path/to"), {}),
+    ).rejects.toBeInstanceOf(reopener.ReopenError);
+  });
 });
 
 describe("reopenIssues", () => {

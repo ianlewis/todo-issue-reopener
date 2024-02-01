@@ -118,20 +118,28 @@ export async function getTODOIssues(
   await fs.chmod(todosPath, 0o700);
 
   core.debug(`Running git to get repository root`);
-  const { stdout: gitOut } = await exec.getExecOutput(
-    "git",
-    ["rev-parse", "--show-toplevel"],
-    {
-      cwd: wd,
-    },
-  );
+  const {
+    exitCode: gitExitCode,
+    stdout: gitOut,
+    stderr: gitErr,
+  } = await exec.getExecOutput("git", ["rev-parse", "--show-toplevel"], {
+    cwd: wd,
+  });
+  core.debug(`Ran git rev-parse`);
+  if (gitExitCode !== 0) {
+    throw new ReopenError(
+      `git exited ${gitExitCode}: ${gitErr}: is ${wd} in a git checkout?`,
+    );
+  }
+
   const repoRoot = gitOut.trim();
 
   core.debug(`Running todos (${todosPath})`);
   const { exitCode, stdout, stderr } = await exec.getExecOutput(
     todosPath,
-    // TODO: get new relative directory to repoRoot
-    ["--output=json", path.relative(repoRoot, wd)],
+    // Get the relative directory from the repsository root so that we have the
+    // right paths to link to the files in generated issues.
+    ["--output=json", path.relative(repoRoot, wd) || "."],
     {
       cwd: repoRoot,
       ignoreReturnCode: true,

@@ -20,7 +20,7 @@ inputs:
     required: false
     default: ".github/issue-reopener.yml"
   path:
-    description: "Base path to search."
+    description: "Base path to search. This path must be inside the git checkout."
     required: false
     default: ${{ github.workspace }}
   token:
