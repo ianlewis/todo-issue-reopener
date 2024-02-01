@@ -177,8 +177,6 @@ jobs:
 
   issue-reopener-basic:
     runs-on: ubuntu-latest
-    # NOTE: Don't run on release since the binaries haven't been created yet.
-    if: ${{ ! startsWith(github.event.pull_request.title, 'chore(release):') }}
     outputs:
       issue-url: ${{ steps.create-issue.outputs.url }}
     permissions:
@@ -237,8 +235,6 @@ jobs:
 
   issue-reopener-dry-run:
     runs-on: ubuntu-latest
-    # NOTE: Don't run on release since the binaries haven't been created yet.
-    if: ${{ ! startsWith(github.event.pull_request.title, 'chore(release):') }}
     outputs:
       issue-url: ${{ steps.create-issue.outputs.url }}
     permissions:
@@ -293,8 +289,6 @@ jobs:
 
   issue-reopener-subdir:
     runs-on: ubuntu-latest
-    # NOTE: Don't run on release since the binaries haven't been created yet.
-    if: ${{ ! startsWith(github.event.pull_request.title, 'chore(release):') }}
     outputs:
       issue-url: ${{ steps.create-issue.outputs.url }}
     permissions:
@@ -356,8 +350,6 @@ jobs:
 
   issue-reopener-vanityURLs:
     runs-on: ubuntu-latest
-    # NOTE: Don't run on release since the binaries haven't been created yet.
-    if: ${{ ! startsWith(github.event.pull_request.title, 'chore(release):') }}
     outputs:
       issue-url: ${{ steps.create-issue.outputs.url }}
     permissions:
