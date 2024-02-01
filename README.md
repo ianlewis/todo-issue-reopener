@@ -1,6 +1,12 @@
 # todo-issue-reopener
 
-The `ianlewis/todo-issue-reopener` GitHub Action searches your checked out code
+[![tests](https://github.com/ianlewis/todo-issue-reopener/actions/workflows/pre-submit.units.yml/badge.svg)](https://github.com/ianlewis/todo-issue-reopener/actions/workflows/pre-submit.units.yml)
+[![codecov](https://codecov.io/gh/ianlewis/todo-issue-reopener/graph/badge.svg?token=KFDFRHMBU5)](https://codecov.io/gh/ianlewis/todo-issue-reopener)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/ianlewis/todo-issue-reopener/badge)](https://api.securityscorecards.dev/projects/github.com/ianlewis/todo-issue-reopener)
+[![SLSA 3](https://slsa.dev/images/gh-badge-level3.svg)](https://slsa.dev)
+
+The `ianlewis/todo-issue-reopener` GitHub Action uses the
+[todos](https://github.com/ianlewis/todos) tool to search your checked out code
 for TODO comments that reference issues and reopens issues that have been
 closed prematurely. `todo-issue-reopener` will also add a comment on the issue
 with a link to the source code where the TODO can be found.
@@ -13,6 +19,9 @@ TODO comments can take the following forms:
 // TODO(github.com/owner/repo/issues/123): Referencing the issue url without scheme.
 // TODO(https://github.com/owner/repo/issues/123): Referencing the issue url with scheme.
 ```
+
+See the [todos documentation](https://github.com/ianlewis/todos/blob/main/README.md#todo-comment-format)
+for more info on supported formats for TODO comments.
 
 ## Getting Started
 
