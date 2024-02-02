@@ -11,6 +11,8 @@ for TODO comments that reference issues and reopens issues that have been
 closed prematurely. `todo-issue-reopener` will also add a comment on the issue
 with a link to the source code where the TODO can be found.
 
+![reopened issue comment](./comment.png)
+
 TODO comments can take the following forms:
 
 ```golang
@@ -30,7 +32,8 @@ that you can call `ianlewis/todo-issue-reopener` to scan your codebase for TODO
 comments.
 
 Note that you must set the `issues: write` permission on the job if using the
-default `GITHUB_TOKEN`.
+default `GITHUB_TOKEN`. Also note that the directory scanned must be in a git
+checkout.
 
 ```yaml
 on:
@@ -53,12 +56,12 @@ jobs:
 
 ## Inputs
 
-| Name        | Required | Default                      | Description                                                                |
-| ----------- | -------- | ---------------------------- | -------------------------------------------------------------------------- |
-| path        | No       | `github.workspace`           | The root path of the source code to search.                                |
-| token       | No       | `github.token`               | The GitHub token to use. This token must have `issues: write` permissions. |
-| dry-run     | No       | `false`                      | If true, issues are only output to logs and not actually reopened.         |
-| config-path | No       | `.github/issue-reopener.yml` | Path to an optional [config file](#configuration).                         |
+| Name          | Required | Default                      | Description                                                                |
+| ------------- | -------- | ---------------------------- | -------------------------------------------------------------------------- |
+| `path`        | No       | `github.workspace`           | The root path of the source code to search.                                |
+| `token`       | No       | `github.token`               | The GitHub token to use. This token must have `issues: write` permissions. |
+| `dry-run`     | No       | `false`                      | If true, issues are only output to logs and not actually reopened.         |
+| `config-path` | No       | `.github/issue-reopener.yml` | Path to an optional [config file](#configuration).                         |
 
 ## Outputs
 
@@ -66,7 +69,9 @@ There are currently no outputs.
 
 ## Configuration
 
-An optional configuration file in YAML format can added to your repository.
+An optional configuration file in YAML format can added to your repository. The
+path can be specified by the `config-path` input. It defaults to
+`.github/issue-reopener.yml`.
 
 ### vanityURLs
 
