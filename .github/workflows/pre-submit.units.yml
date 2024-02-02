@@ -264,8 +264,13 @@ jobs:
     permissions:
       issues: write
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Checkout action
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          path: "todo-issue-reopener"
+
       - id: create-issue
+        name: Create closed issue
         env:
           GH_TOKEN: ${{ github.token }}
           PR_URL: ${{ github.event.pull_request.html_url }}
@@ -278,16 +283,23 @@ jobs:
           fi
           body="${body}
           - [Workflow run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/attempts/${GITHUB_RUN_ATTEMPT})"
-
-          url=$(gh issue create -R "${GITHUB_REPOSITORY}" --title "issue-reopener-basic pre-submit test issue" --body "${body}")
+          url=$(gh issue create -R "${GITHUB_REPOSITORY}" --title "issue-reopener-path pre-submit test issue" --body "${body}")
           echo "${url}"
           gh issue close "${url}"
-          mkdir test
-          echo "// TODO(${url}): still open" > test/test.go
           echo "url=${url}" >> "${GITHUB_OUTPUT}"
-      - uses: ./
+
+      - name: Setup mock repo
+        env:
+          ISSUE_URL: ${{ steps.create-issue.outputs.url }}
+        run: |
+          git init
+          mkdir test
+          echo "// TODO(${ISSUE_URL}): still open" > test/test.go
+
+      - uses: ./todo-issue-reopener/
         with:
           path: "test/"
+
       - env:
           GH_TOKEN: ${{ github.token }}
           ISSUE_URL: ${{ steps.create-issue.outputs.url }}
@@ -322,8 +334,21 @@ jobs:
     permissions:
       issues: write
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Checkout action
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          path: "todo-issue-reopener"
+
+      # NOTE: We want to call the todo-issue-reopener action from a checkout on
+      #       the default path of GITHUB_WORKSPACE but we don't want the code
+      #       from the action itself to affect the outcome. We move it to /tmp
+      #       so that it outside of the GITHUB_WORKSPACE.
+      - name: Move checkout to tmp
+        run: |
+          mv "${GITHUB_WORKSPACE}/todo-issue-reopener" "/tmp"
+
       - id: create-issue
+        name: Create closed issue
         env:
           GH_TOKEN: ${{ github.token }}
           PR_URL: ${{ github.event.pull_request.html_url }}
@@ -336,18 +361,30 @@ jobs:
           fi
           body="${body}
           - [Workflow run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/attempts/${GITHUB_RUN_ATTEMPT})"
-
-          url=$(gh issue create --title "issue-reopener-dry-run pre-submit test issue" --body "${body}")
+          url=$(gh issue create -R "${GITHUB_REPOSITORY}" --title "issue-reopener-dry-run pre-submit test issue" --body "${body}")
           echo "${url}"
           gh issue close "${url}"
-          mkdir test
-          echo "// TODO(${url}): still open" > test/test.go
           echo "url=${url}" >> "${GITHUB_OUTPUT}"
-      - uses: ./
+
+      - name: Setup mock repo
+        env:
+          ISSUE_URL: ${{ steps.create-issue.outputs.url }}
+        run: |
+          git init
+          mkdir test
+          echo "// TODO(${ISSUE_URL}): still open" > test/test.go
+
+      # NOTE: We cannot use dynamic variables or absolute paths.
+      # Here we must provide a path relative to GITHUB_WORKSPACE so we ensure
+      # we get back to the root tmp directory no matter what GITHUB_WORKSPACE
+      # directory is set to.
+      - name: Run todo-issue-reopener
+        uses: "./../../../../../../../../../../../tmp/todo-issue-reopener"
         with:
-          path: "test/"
           dry-run: true
-      - env:
+
+      - name: Check issue is still closed.
+        env:
           GH_TOKEN: ${{ github.token }}
           ISSUE_URL: ${{ steps.create-issue.outputs.url }}
         run: |
@@ -376,11 +413,13 @@ jobs:
     permissions:
       issues: write
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Checkout action
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
-          path: "repo"
+          path: "todo-issue-reopener"
 
       - id: create-issue
+        name: Create closed issue
         env:
           GH_TOKEN: ${{ github.token }}
           PR_URL: ${{ github.event.pull_request.html_url }}
@@ -393,16 +432,28 @@ jobs:
           fi
           body="${body}
           - [Workflow run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/attempts/${GITHUB_RUN_ATTEMPT})"
-
           url=$(gh issue create -R "${GITHUB_REPOSITORY}" --title "issue-reopener-subdir pre-submit test issue" --body "${body}")
           echo "${url}"
           gh issue close "${url}"
-          mkdir -p repo/test
-          echo "// TODO(${url}): still open" > repo/test/test.go
           echo "url=${url}" >> "${GITHUB_OUTPUT}"
-      - uses: ./repo/
+
+      - name: Setup mock repo
+        env:
+          ISSUE_URL: ${{ steps.create-issue.outputs.url }}
+        run: |
+          git init
+          mkdir -p test/subdir
+          echo "// TODO(${ISSUE_URL}): still open" > test/subdir/test.go
+
+      # NOTE: We cannot use dynamic variables or absolute paths.
+      # Here we must provide a path relative to GITHUB_WORKSPACE so we ensure
+      # we get back to the root tmp directory no matter what GITHUB_WORKSPACE
+      # directory is set to.
+      - name: Run todo-issue-reopener
+        uses: "./../../../../../../../../../../../tmp/todo-issue-reopener"
         with:
-          path: "repo/test"
+          path: "test/subdir/"
+
       - env:
           GH_TOKEN: ${{ github.token }}
           ISSUE_URL: ${{ steps.create-issue.outputs.url }}
@@ -437,8 +488,21 @@ jobs:
     permissions:
       issues: write
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Checkout action
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          path: "todo-issue-reopener"
+
+      # NOTE: We want to call the todo-issue-reopener action from a checkout on
+      #       the default path of GITHUB_WORKSPACE but we don't want the code
+      #       from the action itself to affect the outcome. We move it to /tmp
+      #       so that it outside of the GITHUB_WORKSPACE.
+      - name: Move checkout to tmp
+        run: |
+          mv "${GITHUB_WORKSPACE}/todo-issue-reopener" "/tmp"
+
       - id: create-issue
+        name: Create closed issue
         env:
           GH_TOKEN: ${{ github.token }}
           PR_URL: ${{ github.event.pull_request.html_url }}
@@ -451,21 +515,33 @@ jobs:
           fi
           body="${body}
           - [Workflow run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/attempts/${GITHUB_RUN_ATTEMPT})"
-
-          url=$(gh issue create -R "${GITHUB_REPOSITORY}" --title "issue-reopener-vanityURLs pre-submit test issue" --body "${body}")
-          issue_no="${url##*/}"
+          url=$(gh issue create -R "${GITHUB_REPOSITORY}" --title "issue-reopener-basic pre-submit test issue" --body "${body}")
+          echo "${url}"
           gh issue close "${url}"
+          echo "url=${url}" >> "${GITHUB_OUTPUT}"
+
+      - name: Setup mock repo
+        env:
+          ISSUE_URL: ${{ steps.create-issue.outputs.url }}
+        run: |
+          git init
           mkdir test
+          issue_no="${ISSUE_URL##*/}"
           vanity_url="https://golang.org/issues/${issue_no}"
           echo "${vanity_url}"
           echo "// TODO(${vanity_url}): still open" > test/test.go
-          echo "vanityURLs:" >> test/issue-reopener.yml
-          echo "- \"^\\\\s*(https?://)?golang.org/issues/(?<id>[0-9]+)\\\\s*$\"" >> test/issue-reopener.yml
-          echo "url=${url}" >> "${GITHUB_OUTPUT}"
-      - uses: ./
-        with:
-          path: "test/"
-          config-path: "test/issue-reopener.yml"
+
+          mkdir test/.github
+          echo "vanityURLs:" >> test/.github/issue-reopener.yml
+          echo "- \"^\\\\s*(https?://)?golang.org/issues/(?<id>[0-9]+)\\\\s*$\"" >> test/.github/issue-reopener.yml
+
+      # NOTE: We cannot use dynamic variables or absolute paths.
+      # Here we must provide a path relative to GITHUB_WORKSPACE so we ensure
+      # we get back to the root tmp directory no matter what GITHUB_WORKSPACE
+      # directory is set to.
+      - name: Run todo-issue-reopener
+        uses: "./../../../../../../../../../../../tmp/todo-issue-reopener"
+
       - env:
           GH_TOKEN: ${{ github.token }}
           ISSUE_URL: ${{ steps.create-issue.outputs.url }}
