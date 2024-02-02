@@ -192,7 +192,7 @@ jobs:
           mv "${GITHUB_WORKSPACE}/todo-issue-reopener" "/tmp"
 
       - id: create-issue
-        name: Create Issue
+        name: Create closed issue
         env:
           GH_TOKEN: ${{ github.token }}
           PR_URL: ${{ github.event.pull_request.html_url }}
@@ -205,10 +205,13 @@ jobs:
           fi
           body="${body}
           - [Workflow run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/attempts/${GITHUB_RUN_ATTEMPT})"
-
           url=$(gh issue create -R "${GITHUB_REPOSITORY}" --title "issue-reopener-basic pre-submit test issue" --body "${body}")
           echo "${url}"
           gh issue close "${url}"
+
+      - name: Setup mock repo
+        run: |
+          git init
           mkdir test
           echo "// TODO(${url}): still open" > test/test.go
           echo "url=${url}" >> "${GITHUB_OUTPUT}"
