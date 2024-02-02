@@ -216,7 +216,10 @@ jobs:
           echo "// TODO(${url}): still open" > test/test.go
           echo "url=${url}" >> "${GITHUB_OUTPUT}"
 
-      # NOTE: We cannot use dynamic variables or absolute paths Ensure we get back to the tmp directory.
+      # NOTE: We cannot use dynamic variables or absolute paths.
+      # Here we must provide a path relative to GITHUB_WORKSPACE so we ensure
+      # we get back to the root tmp directory no matter what GITHUB_WORKSPACE
+      # directory is set to.
       - name: Run todo-issue-reopener
         uses: "./../../../../../../../../../../../tmp/todo-issue-reopener"
 
