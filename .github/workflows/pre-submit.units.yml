@@ -445,12 +445,8 @@ jobs:
           mkdir -p test/subdir
           echo "// TODO(${ISSUE_URL}): still open" > test/subdir/test.go
 
-      # NOTE: We cannot use dynamic variables or absolute paths.
-      # Here we must provide a path relative to GITHUB_WORKSPACE so we ensure
-      # we get back to the root tmp directory no matter what GITHUB_WORKSPACE
-      # directory is set to.
       - name: Run todo-issue-reopener
-        uses: "./../../../../../../../../../../../tmp/todo-issue-reopener"
+        uses: "./todo-issue-reopener"
         with:
           path: "test/subdir/"
 
@@ -528,12 +524,13 @@ jobs:
           mkdir test
           issue_no="${ISSUE_URL##*/}"
           vanity_url="https://golang.org/issues/${issue_no}"
+
           echo "${vanity_url}"
           echo "// TODO(${vanity_url}): still open" > test/test.go
 
-          mkdir test/.github
-          echo "vanityURLs:" >> test/.github/issue-reopener.yml
-          echo "- \"^\\\\s*(https?://)?golang.org/issues/(?<id>[0-9]+)\\\\s*$\"" >> test/.github/issue-reopener.yml
+          mkdir .github
+          echo "vanityURLs:" >> .github/issue-reopener.yml
+          echo "- \"^\\\\s*(https?://)?golang.org/issues/(?<id>[0-9]+)\\\\s*$\"" >> .github/issue-reopener.yml
 
       # NOTE: We cannot use dynamic variables or absolute paths.
       # Here we must provide a path relative to GITHUB_WORKSPACE so we ensure
