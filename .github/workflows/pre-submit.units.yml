@@ -212,13 +212,13 @@ jobs:
           url=$(gh issue create -R "${GITHUB_REPOSITORY}" --title "issue-reopener-basic pre-submit test issue" --body "${body}")
           echo "${url}"
           gh issue close "${url}"
+          echo "url=${url}" >> "${GITHUB_OUTPUT}"
 
       - name: Setup mock repo
         run: |
           git init
           mkdir test
           echo "// TODO(${url}): still open" > test/test.go
-          echo "url=${url}" >> "${GITHUB_OUTPUT}"
 
       # NOTE: We cannot use dynamic variables or absolute paths.
       # Here we must provide a path relative to GITHUB_WORKSPACE so we ensure
