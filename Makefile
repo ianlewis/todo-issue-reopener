@@ -85,7 +85,7 @@ format: md-format yaml-format ## Format all files
 
 .PHONY: md-format
 md-format: node_modules/.installed ## Format Markdown files.
-	@set -e;\
+	@set -euo pipefail; \
 		files=$$( \
 			find . -type f \
 				\( \
@@ -100,7 +100,7 @@ md-format: node_modules/.installed ## Format Markdown files.
 
 .PHONY: yaml-format
 yaml-format: node_modules/.installed ## Format YAML files.
-	@set -e;\
+	@set -euo pipefail; \
 		files=$$( \
 			find . -type f \
 				\( \
@@ -131,7 +131,7 @@ lint: yamllint actionlint markdownlint eslint ## Run all linters.
 .PHONY: actionlint
 actionlint: ## Runs the actionlint linter.
 	@# NOTE: We need to ignore config files used in tests.
-	@set -e;\
+	@set -euo pipefail; \
 		files=$$( \
 			find .github/workflows/ -type f \
 				\( \
@@ -147,7 +147,7 @@ actionlint: ## Runs the actionlint linter.
 
 .PHONY: markdownlint
 markdownlint: node_modules/.installed ## Runs the markdownlint linter.
-	@set -e;\
+	@set -euo pipefail; \
 		if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
 			exit_code=0; \
 			while IFS="" read -r p && [ -n "$$p" ]; do \
@@ -165,7 +165,8 @@ markdownlint: node_modules/.installed ## Runs the markdownlint linter.
 
 .PHONY: yamllint
 yamllint: ## Runs the yamllint linter.
-	@set -e;\
+	@set -euo pipefail; \
+		set -euo pipefail; \
 		extraargs=""; \
 		if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
 			extraargs="-f github"; \
@@ -174,8 +175,9 @@ yamllint: ## Runs the yamllint linter.
 
 .PHONY: eslint
 eslint: node_modules/.installed ## Runs eslint.
-	@set -e;\
+	@set -euo pipefail; \
 		if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
+			set -euo pipefail; \
 			exit_code=0; \
 			while IFS="" read -r p && [ -n "$$p" ]; do \
 				file=$$(echo "$$p" | jq -c '.filePath // empty' | tr -d '"'); \
