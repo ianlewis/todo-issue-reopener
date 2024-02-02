@@ -441,9 +441,10 @@ jobs:
         env:
           ISSUE_URL: ${{ steps.create-issue.outputs.url }}
         run: |
-          git init
           mkdir -p test/subdir
-          echo "// TODO(${ISSUE_URL}): still open" > test/subdir/test.go
+          cd test/
+          git init
+          echo "// TODO(${ISSUE_URL}): still open" > subdir/test.go
 
       - name: Run todo-issue-reopener
         uses: "./todo-issue-reopener"
@@ -461,7 +462,7 @@ jobs:
           # Check that the body contains the right path
           # NOTE: Need to get text output in order to get issue comments.
           body=$(gh issue view "${ISSUE_URL}" -c)
-          [[ "${body}" == *"1. [test/test.go:1]"* ]]
+          [[ "${body}" == *"1. [subdir/test.go:1]"* ]]
 
   issue-reopener-subdir-cleanup:
     runs-on: ubuntu-latest
