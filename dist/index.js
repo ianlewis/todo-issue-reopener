@@ -338,14 +338,19 @@ function getTODOIssues(wd, conf) {
         core.debug(`Setting ${todosPath} as executable`);
         yield fs.chmod(todosPath, 0o700);
         core.debug(`Running git to get repository root`);
-        const { stdout: gitOut } = yield exec.getExecOutput("git", ["rev-parse", "--show-toplevel"], {
+        const { exitCode: gitExitCode, stdout: gitOut, stderr: gitErr, } = yield exec.getExecOutput("git", ["rev-parse", "--show-toplevel"], {
             cwd: wd,
         });
+        core.debug(`Ran git rev-parse`);
+        if (gitExitCode !== 0) {
+            throw new ReopenError(`git exited ${gitExitCode}: ${gitErr}: is ${wd} in a git checkout?`);
+        }
         const repoRoot = gitOut.trim();
         core.debug(`Running todos (${todosPath})`);
         const { exitCode, stdout, stderr } = yield exec.getExecOutput(todosPath, 
-        // TODO: get new relative directory to repoRoot
-        ["--output=json", path.relative(repoRoot, wd)], {
+        // Get the relative directory from the repsository root so that we have the
+        // right paths to link to the files in generated issues.
+        ["--output=json", path.relative(repoRoot, wd) || "."], {
             cwd: repoRoot,
             ignoreReturnCode: true,
         });
