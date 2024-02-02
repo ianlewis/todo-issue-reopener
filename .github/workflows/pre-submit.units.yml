@@ -182,15 +182,17 @@ jobs:
     permissions:
       issues: write
     steps:
-      - id: Checkout action
+      - name: Checkout action
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
           path: "todo-issue-reopener"
-      - id: Move checkout to tmp
+
+      - name: Move checkout to tmp
         run: |
           mv "${GITHUB_WORKSPACE}/todo-issue-reopener" "/tmp"
 
       - id: create-issue
+        name: Create Issue
         env:
           GH_TOKEN: ${{ github.token }}
           PR_URL: ${{ github.event.pull_request.html_url }}
@@ -212,8 +214,11 @@ jobs:
           echo "url=${url}" >> "${GITHUB_OUTPUT}"
 
       # NOTE: We cannot use dynamic variables or absolute paths Ensure we get back to the tmp directory.
-      - uses: "./../../../../../../../../../../../tmp/todo-issue-reopener"
-      - env:
+      - name: Run todo-issue-reopener
+        uses: "./../../../../../../../../../../../tmp/todo-issue-reopener"
+
+      - name: Check issue was reopened
+        env:
           GH_TOKEN: ${{ github.token }}
           ISSUE_URL: ${{ steps.create-issue.outputs.url }}
         run: |
