@@ -181,7 +181,6 @@ eslint: node_modules/.installed ## Runs eslint.
 			exit_code=0; \
 			while IFS="" read -r p && [ -n "$$p" ]; do \
 				file=$$(echo "$$p" | jq -c '.filePath // empty' | tr -d '"'); \
-				file=$$(realpath --relative-to "$(REPO_ROOT)" "$$file"); \
 				while IFS="" read -r m && [ -n "$$m" ]; do \
 					severity=$$(echo "$$m" | jq -c '.severity // empty' | tr -d '"'); \
 					line=$$(echo "$$m" | jq -c '.line // empty' | tr -d '"'); \
