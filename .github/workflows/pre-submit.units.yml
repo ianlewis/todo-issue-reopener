@@ -187,6 +187,10 @@ jobs:
         with:
           path: "todo-issue-reopener"
 
+      # NOTE: We want to call the todo-issue-reopener action from a checkout on
+      #       the default path of GITHUB_WORKSPACE but we don't want the code
+      #       from the action itself to affect the outcome. We move it to /tmp
+      #       so that it outside of the GITHUB_WORKSPACE.
       - name: Move checkout to tmp
         run: |
           mv "${GITHUB_WORKSPACE}/todo-issue-reopener" "/tmp"
