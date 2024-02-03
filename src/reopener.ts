@@ -226,7 +226,7 @@ export async function reopenIssues(
 
     // Remove the ref from the workflow ref as well as the repo and owner to
     // retrive just the path component.
-    let workflowPath = (env.GITHUB_WORKFLOW_REF || "")
+    const workflowPath = (env.GITHUB_WORKFLOW_REF || "")
       .split("@")[0]
       .split("/")
       .slice(2)
