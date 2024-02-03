@@ -418,7 +418,7 @@ function reopenIssues(wd, issues, token, dryRun) {
             });
             // Remove the ref from the workflow ref as well as the repo and owner to
             // retrive just the path component.
-            let workflowPath = (process_1.env.GITHUB_WORKFLOW_REF || "")
+            const workflowPath = (process_1.env.GITHUB_WORKFLOW_REF || "")
                 .split("@")[0]
                 .split("/")
                 .slice(2)
