@@ -17,8 +17,7 @@ name: Dependabot Codecov
 on:
   workflow_run:
     workflows: ["tests"]
-    types:
-      - completed:
+    types: ["completed"]
 
 jobs:
   codecov:
