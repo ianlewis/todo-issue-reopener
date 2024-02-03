@@ -224,7 +224,13 @@ export async function reopenIssues(
       state: "open",
     });
 
-    const workflowPath = (env.GITHUB_WORKFLOW_REF || "").split("@")[0];
+    // Remove the ref from the workflow ref as well as the repo and owner to
+    // retrive just the path component.
+    let workflowPath = (env.GITHUB_WORKFLOW_REF || "")
+      .split("@")[0]
+      .split("/")
+      .slice(2)
+      .join("/");
 
     let body = `This issue was reopened by the todo-issue-reopener action in the ["${env.GITHUB_WORKFLOW}"](https://github.com/${repo.owner}/${repo.repo}/blob/${sha}/${workflowPath}) GitHub Actions workflow because there are TODOs referencing this issue:\n`;
     for (const [i, todo] of issueRef.todos.entries()) {
