@@ -40,19 +40,12 @@ jobs:
       - name: unit tests
         run: |
           make unit-test
-      - name: Upload coverage reports
-        uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # v4.3.0
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@eaaf4bedf32dbdc6b720b63067d99c4d77d6047d # v3.1.4
         with:
-          name: "cobertura-coverage.xml"
-          path: "coverage/cobertura-coverage.xml"
-
-      # TODO: remove
-      # - name: Upload coverage reports to Codecov
-      #   uses: codecov/codecov-action@eaaf4bedf32dbdc6b720b63067d99c4d77d6047d # v3.1.4
-      #   with:
-      #     token: ${{ secrets.CODECOV_TOKEN }}
-      #     files: "coverage/cobertura-coverage.xml"
-      #     fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: "coverage/cobertura-coverage.xml"
+          fail_ci_if_error: true
 
   # check-dist for actions
   ###############################
