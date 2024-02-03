@@ -21,6 +21,7 @@ import * as github from "@actions/github";
 
 import * as verifier from "./verifier";
 import * as config from "./config";
+import { env } from "process";
 
 const TODOS_VERSION = "v0.7.0";
 const SLSA_VERIFIER_VERSION = "v2.3.0";
@@ -223,7 +224,15 @@ export async function reopenIssues(
       state: "open",
     });
 
-    let body = "There are TODOs referencing this issue:\n";
+    // Remove the ref from the workflow ref as well as the repo and owner to
+    // retrive just the path component.
+    const workflowPath = (env.GITHUB_WORKFLOW_REF || "")
+      .split("@")[0]
+      .split("/")
+      .slice(2)
+      .join("/");
+
+    let body = `This issue was reopened by the todo-issue-reopener action in the ["${env.GITHUB_WORKFLOW}"](https://github.com/${repo.owner}/${repo.repo}/blob/${sha}/${workflowPath}) GitHub Actions workflow because there are TODOs referencing this issue:\n`;
     for (const [i, todo] of issueRef.todos.entries()) {
       // NOTE: Get the path from the root of the repository.
       body += `${i + 1}. [${todo.path}:${todo.line}](https://github.com/${

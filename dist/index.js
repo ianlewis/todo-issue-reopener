@@ -264,6 +264,7 @@ const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
 const github = __importStar(__nccwpck_require__(5438));
 const verifier = __importStar(__nccwpck_require__(5854));
+const process_1 = __nccwpck_require__(7282);
 const TODOS_VERSION = "v0.7.0";
 const SLSA_VERIFIER_VERSION = "v2.3.0";
 const SLSA_VERIFIER_SHA256SUM = "ea687149d658efecda64d69da999efb84bb695a3212f29548d4897994027172d";
@@ -415,7 +416,14 @@ function reopenIssues(wd, issues, token, dryRun) {
                 issue_number: issueRef.issueID,
                 state: "open",
             });
-            let body = "There are TODOs referencing this issue:\n";
+            // Remove the ref from the workflow ref as well as the repo and owner to
+            // retrive just the path component.
+            const workflowPath = (process_1.env.GITHUB_WORKFLOW_REF || "")
+                .split("@")[0]
+                .split("/")
+                .slice(2)
+                .join("/");
+            let body = `This issue was reopened by the todo-issue-reopener action in the ["${process_1.env.GITHUB_WORKFLOW}"](https://github.com/${repo.owner}/${repo.repo}/blob/${sha}/${workflowPath}) GitHub Actions workflow because there are TODOs referencing this issue:\n`;
             for (const [i, todo] of issueRef.todos.entries()) {
                 // NOTE: Get the path from the root of the repository.
                 body += `${i + 1}. [${todo.path}:${todo.line}](https://github.com/${repo.owner}/${repo.repo}/blob/${sha}/${todo.path}#L${todo.line}): ${todo.message}\n`;
@@ -33522,6 +33530,14 @@ module.exports = require("path");
 
 "use strict";
 module.exports = require("perf_hooks");
+
+/***/ }),
+
+/***/ 7282:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("process");
 
 /***/ }),
 
