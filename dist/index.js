@@ -416,7 +416,13 @@ function reopenIssues(wd, issues, token, dryRun) {
                 issue_number: issueRef.issueID,
                 state: "open",
             });
-            const workflowPath = (process_1.env.GITHUB_WORKFLOW_REF || "").split("@")[0];
+            // Remove the ref from the workflow ref as well as the repo and owner to
+            // retrive just the path component.
+            let workflowPath = (process_1.env.GITHUB_WORKFLOW_REF || "")
+                .split("@")[0]
+                .split("/")
+                .slice(2)
+                .join("/");
             let body = `This issue was reopened by the todo-issue-reopener action in the ["${process_1.env.GITHUB_WORKFLOW}"](https://github.com/${repo.owner}/${repo.repo}/blob/${sha}/${workflowPath}) GitHub Actions workflow because there are TODOs referencing this issue:\n`;
             for (const [i, todo] of issueRef.todos.entries()) {
                 // NOTE: Get the path from the root of the repository.
