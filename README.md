@@ -86,5 +86,5 @@ Example:
 
 ```yaml
 vanityURLs:
-  - "^\\s*(https?://)?golang.org/issues/(?<id>[0-9]+)\\s*$",
+  - "^\\s*(https?://)?golang.org/issues/(?<id>[0-9]+)\\s*$"
 ```
