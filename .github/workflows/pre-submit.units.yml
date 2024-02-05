@@ -209,7 +209,7 @@ jobs:
           fi
           body="${body}
           - [Workflow run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/attempts/${GITHUB_RUN_ATTEMPT})"
-          url=$(gh issue create -R "${GITHUB_REPOSITORY}" --title "issue-reopener-basic pre-submit test issue" --body "${body}")
+          url=$(gh issue create -R "${GITHUB_REPOSITORY}" --title "issue-reopener-basic pre-submit test issue" --body "${body}" --label "test-issue")
           echo "${url}"
           gh issue close "${url}"
           echo "url=${url}" >> "${GITHUB_OUTPUT}"
@@ -283,7 +283,7 @@ jobs:
           fi
           body="${body}
           - [Workflow run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/attempts/${GITHUB_RUN_ATTEMPT})"
-          url=$(gh issue create -R "${GITHUB_REPOSITORY}" --title "issue-reopener-path pre-submit test issue" --body "${body}")
+          url=$(gh issue create -R "${GITHUB_REPOSITORY}" --title "issue-reopener-path pre-submit test issue" --body "${body}" --label "test-issue")
           echo "${url}"
           gh issue close "${url}"
           echo "url=${url}" >> "${GITHUB_OUTPUT}"
@@ -361,7 +361,7 @@ jobs:
           fi
           body="${body}
           - [Workflow run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/attempts/${GITHUB_RUN_ATTEMPT})"
-          url=$(gh issue create -R "${GITHUB_REPOSITORY}" --title "issue-reopener-dry-run pre-submit test issue" --body "${body}")
+          url=$(gh issue create -R "${GITHUB_REPOSITORY}" --title "issue-reopener-dry-run pre-submit test issue" --body "${body}" --label "test-issue")
           echo "${url}"
           gh issue close "${url}"
           echo "url=${url}" >> "${GITHUB_OUTPUT}"
@@ -432,7 +432,7 @@ jobs:
           fi
           body="${body}
           - [Workflow run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/attempts/${GITHUB_RUN_ATTEMPT})"
-          url=$(gh issue create -R "${GITHUB_REPOSITORY}" --title "issue-reopener-subdir pre-submit test issue" --body "${body}")
+          url=$(gh issue create -R "${GITHUB_REPOSITORY}" --title "issue-reopener-subdir pre-submit test issue" --body "${body}" --label "test-issue")
           echo "${url}"
           gh issue close "${url}"
           echo "url=${url}" >> "${GITHUB_OUTPUT}"
@@ -512,7 +512,7 @@ jobs:
           fi
           body="${body}
           - [Workflow run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/attempts/${GITHUB_RUN_ATTEMPT})"
-          url=$(gh issue create -R "${GITHUB_REPOSITORY}" --title "issue-reopener-basic pre-submit test issue" --body "${body}")
+          url=$(gh issue create -R "${GITHUB_REPOSITORY}" --title "issue-reopener-vanityURLs pre-submit test issue" --body "${body}" --label "test-issue")
           echo "${url}"
           gh issue close "${url}"
           echo "url=${url}" >> "${GITHUB_OUTPUT}"
