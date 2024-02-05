@@ -291,12 +291,13 @@ describe("getTODOIssues", () => {
     await expect(p).resolves.toHaveLength(2);
     let issues = await p;
 
-    // NOTE: This may be flaky depending on Map implementation.
-    // TODO: Update test to not depend on order of Map.values()
-    expect(issues[0].issueID).toBe(123);
-    expect(issues[0].todos).toHaveLength(2);
-    expect(issues[1].issueID).toBe(456);
-    expect(issues[1].todos).toHaveLength(1);
+    const issue123 = issues.find((i) => i.issueID == 123);
+    expect(issue123).toBeDefined();
+    expect(issue123!.todos).toHaveLength(2);
+
+    const issue456 = issues.find((i) => i.issueID == 456);
+    expect(issue456).toBeDefined();
+    expect(issue456!.todos).toHaveLength(1);
   });
 
   it("handles todos error", async () => {
