@@ -119,8 +119,7 @@ jobs:
           SHELLCHECK_VERSION: "0.9.0"
           SHELLCHECK_CHECKSUM: "700324c6dd0ebea0117591c6cc9d7350d9c7c5c287acbad7630fa17b1d4d9e2f"
           ACTIONLINT_VERSION: "1.6.26"
-          # FIXME: Update checksum
-          ACTIONLINT_CHECKSUM: "3c5818744143a5d6754edd3dcc4c2b32c9dfcdd3bb30e0e108fb5e5c505262d4"
+          ACTIONLINT_CHECKSUM: "f0294c342af98fad4ff917bc32032f28e1b55f76aedf291886ec10bbed7c12e1"
         run: |
           set -euo pipefail
 
