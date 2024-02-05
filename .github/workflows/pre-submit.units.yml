@@ -117,8 +117,7 @@ jobs:
       - name: actionlint
         env:
           SHELLCHECK_VERSION: "0.9.0"
-          # FIXME: Update checksum
-          SHELLCHECK_CHECKSUM: "ab6ee1b178f014d1b86d1e24da20d1139656c8b0ed34d2867fbb834dad02bf0a"
+          SHELLCHECK_CHECKSUM: "700324c6dd0ebea0117591c6cc9d7350d9c7c5c287acbad7630fa17b1d4d9e2f"
           ACTIONLINT_VERSION: "1.6.26"
           # FIXME: Update checksum
           ACTIONLINT_CHECKSUM: "3c5818744143a5d6754edd3dcc4c2b32c9dfcdd3bb30e0e108fb5e5c505262d4"
@@ -128,7 +127,7 @@ jobs:
           # Install shellcheck
           curl -sSLo shellcheck.tar.gz "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz"
           if ! echo "${SHELLCHECK_CHECKSUM}  shellcheck.tar.gz" | sha256sum --strict --check --status; then
-              echo "::error::Unexpected checksum for shellcehck: expected '${SHELLCHECK_CHECKSUM}', got '$(sha256sum shellcheck.tar.gz | awk '{ print $1 }')'"
+              echo "::error::Unexpected checksum for shellcheck: expected '${SHELLCHECK_CHECKSUM}', got '$(sha256sum shellcheck.tar.gz | awk '{ print $1 }')'"
               exit 1
           fi
 
