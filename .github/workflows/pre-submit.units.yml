@@ -67,8 +67,10 @@ jobs:
         run: |
           set -euo pipefail
           if [ "$(git diff --ignore-space-at-eol dist/ | wc -l)" -gt "0" ]; then
-            echo "Detected uncommitted changes after build.  See status below:"
-            git diff
+            echo "::error::Detected uncommitted changes after build.  See status below:"
+            echo "::group::git diff"
+            GIT_PAGER="cat" git diff
+            echo "::endgroup::"
             exit 1
           fi
 
@@ -98,8 +100,10 @@ jobs:
         run: |
           set -euo pipefail
           if [ "$(GIT_PAGER="cat" git diff --ignore-space-at-eol | wc -l)" -gt "0" ]; then
-              echo "Detected license header changes.  See status below:"
+              echo "::error::Detected license header changes.  See status below:"
+              echo "::group::git diff"
               GIT_PAGER="cat" git diff
+              echo "::endgroup::"
               exit 1
           fi
 
@@ -112,27 +116,29 @@ jobs:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: actionlint
         env:
-          SHELLCHECK_VERSION: "0.8.0"
-          SHELLCHECK_CHECKSUM: "ab6ee1b178f014d1b86d1e24da20d1139656c8b0ed34d2867fbb834dad02bf0a"
-          ACTIONLINT_VERSION: "1.6.24"
-          ACTIONLINT_CHECKSUM: "3c5818744143a5d6754edd3dcc4c2b32c9dfcdd3bb30e0e108fb5e5c505262d4"
+          SHELLCHECK_VERSION: "0.9.0"
+          SHELLCHECK_CHECKSUM: "700324c6dd0ebea0117591c6cc9d7350d9c7c5c287acbad7630fa17b1d4d9e2f"
+          ACTIONLINT_VERSION: "1.6.26"
+          ACTIONLINT_CHECKSUM: "f0294c342af98fad4ff917bc32032f28e1b55f76aedf291886ec10bbed7c12e1"
         run: |
           set -euo pipefail
 
           # Install shellcheck
           curl -sSLo shellcheck.tar.gz "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz"
-          echo "shellcheck checksum is $(sha256sum shellcheck.tar.gz | awk '{ print $1 }')"
-          echo "expected checksum is $SHELLCHECK_CHECKSUM"
-          echo "$SHELLCHECK_CHECKSUM  shellcheck.tar.gz" | sha256sum --strict --check --status || exit 1
+          if ! echo "${SHELLCHECK_CHECKSUM}  shellcheck.tar.gz" | sha256sum --strict --check --status; then
+              echo "::error::Unexpected checksum for shellcheck: expected '${SHELLCHECK_CHECKSUM}', got '$(sha256sum shellcheck.tar.gz | awk '{ print $1 }')'"
+              exit 1
+          fi
 
           tar xf shellcheck.tar.gz
           mv "shellcheck-v${SHELLCHECK_VERSION}/shellcheck" /usr/local/bin
 
           # Install actionlint
           curl -sSLo actionlint.tar.gz "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
-          echo "actionlint checksum is $(sha256sum actionlint.tar.gz | awk '{ print $1 }')"
-          echo "expected checksum is $ACTIONLINT_CHECKSUM"
-          echo "$ACTIONLINT_CHECKSUM  actionlint.tar.gz" | sha256sum --strict --check --status || exit 1
+          if ! echo "${ACTIONLINT_CHECKSUM}  actionlint.tar.gz" | sha256sum --strict --check --status; then
+              echo "::error::Unexpected checksum for actionlint: expected '${ACTIONLINT_CHECKSUM}', got '$(sha256sum actionlint.tar.gz | awk '{ print $1 }')'"
+              exit 1
+          fi
 
           tar xf actionlint.tar.gz
           mv ./actionlint /usr/local/bin
@@ -210,7 +216,7 @@ jobs:
           body="${body}
           - [Workflow run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/attempts/${GITHUB_RUN_ATTEMPT})"
           url=$(gh issue create -R "${GITHUB_REPOSITORY}" --title "issue-reopener-basic pre-submit test issue" --body "${body}" --label "test-issue")
-          echo "${url}"
+          echo "::debug::Closing GitHub issue: ${url}"
           gh issue close "${url}"
           echo "url=${url}" >> "${GITHUB_OUTPUT}"
 
@@ -284,7 +290,7 @@ jobs:
           body="${body}
           - [Workflow run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/attempts/${GITHUB_RUN_ATTEMPT})"
           url=$(gh issue create -R "${GITHUB_REPOSITORY}" --title "issue-reopener-path pre-submit test issue" --body "${body}" --label "test-issue")
-          echo "${url}"
+          echo "::debug::Closing GitHub issue: ${url}"
           gh issue close "${url}"
           echo "url=${url}" >> "${GITHUB_OUTPUT}"
 
@@ -362,7 +368,7 @@ jobs:
           body="${body}
           - [Workflow run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/attempts/${GITHUB_RUN_ATTEMPT})"
           url=$(gh issue create -R "${GITHUB_REPOSITORY}" --title "issue-reopener-dry-run pre-submit test issue" --body "${body}" --label "test-issue")
-          echo "${url}"
+          echo "::debug::Closing GitHub issue: ${url}"
           gh issue close "${url}"
           echo "url=${url}" >> "${GITHUB_OUTPUT}"
 
@@ -433,7 +439,7 @@ jobs:
           body="${body}
           - [Workflow run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/attempts/${GITHUB_RUN_ATTEMPT})"
           url=$(gh issue create -R "${GITHUB_REPOSITORY}" --title "issue-reopener-subdir pre-submit test issue" --body "${body}" --label "test-issue")
-          echo "${url}"
+          echo "::debug::Closing GitHub issue: ${url}"
           gh issue close "${url}"
           echo "url=${url}" >> "${GITHUB_OUTPUT}"
 
@@ -513,7 +519,7 @@ jobs:
           body="${body}
           - [Workflow run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/attempts/${GITHUB_RUN_ATTEMPT})"
           url=$(gh issue create -R "${GITHUB_REPOSITORY}" --title "issue-reopener-vanityURLs pre-submit test issue" --body "${body}" --label "test-issue")
-          echo "${url}"
+          echo "::debug::Closing GitHub issue: ${url}"
           gh issue close "${url}"
           echo "url=${url}" >> "${GITHUB_OUTPUT}"
 
@@ -526,7 +532,7 @@ jobs:
           issue_no="${ISSUE_URL##*/}"
           vanity_url="https://golang.org/issues/${issue_no}"
 
-          echo "${vanity_url}"
+          echo "::debug::Vanity issue url: ${url}"
           echo "// TODO(${vanity_url}): still open" > test/test.go
 
           mkdir .github
