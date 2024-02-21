@@ -7,8 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.2.0] - 2024-02-21
 
+### Fixed in 1.2.0
+
 - `todo-issue-reopener` no longer fails when issues referenced by TODOs do not
   exist ([#553](https://github.com/ianlewis/todo-issue-reopener/issues/553)).
+
+### Updated in 1.2.0
+
+- `todos` v0.8.0 is now used.
 
 ## [1.1.0] - 2024-02-05
 
