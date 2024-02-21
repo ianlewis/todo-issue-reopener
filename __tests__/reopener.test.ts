@@ -456,6 +456,34 @@ describe("reopenIssues", () => {
     expect(issues.update).not.toHaveBeenCalled();
   });
 
+  it("handles non-existing issue", async () => {
+    const issues = {
+      get: jest.fn().mockImplementation(() => {
+        throw new Error("Not Found");
+      }),
+      createComment: jest.fn(),
+      update: jest.fn(),
+    };
+    github.getOctokit.mockImplementation(() => {
+      return {
+        rest: { issues },
+      };
+    });
+
+    const wd = process.env.GITHUB_WORKSPACE as string;
+
+    const todoIssue = new reopener.TODOIssue(123);
+    todoIssue.todos.push(new reopener.TODORef());
+
+    await expect(
+      reopener.reopenIssues(wd, [todoIssue], "", false),
+    ).resolves.toBeUndefined();
+
+    expect(issues.get).toHaveBeenCalled();
+    expect(issues.createComment).not.toHaveBeenCalled();
+    expect(issues.update).not.toHaveBeenCalled();
+  });
+
   it("handles open issue", async () => {
     const issues = {
       get: jest.fn().mockImplementation(() => {

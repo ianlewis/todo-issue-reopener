@@ -192,11 +192,19 @@ export async function reopenIssues(
       continue;
     }
 
-    const resp = await octokit.rest.issues.get({
-      owner: repo.owner,
-      repo: repo.repo,
-      issue_number: issueRef.issueID,
-    });
+    let resp;
+    try {
+      resp = await octokit.rest.issues.get({
+        owner: repo.owner,
+        repo: repo.repo,
+        issue_number: issueRef.issueID,
+      });
+    } catch (e) {
+      const msg = String(e);
+      core.warning(`error getting issue ${issueRef.issueID}: ${msg}`);
+      continue;
+    }
+
     const issue = resp.data;
 
     if (issue.state === "open") {
