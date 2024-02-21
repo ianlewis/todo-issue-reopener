@@ -1,6 +1,6 @@
 {
   "name": "issue-reopener",
-  "version": "0.1.0",
+  "version": "1.2.0",
   "private": true,
   "description": "Reopen issues that are referenced by TODOs",
   "main": "lib/main.js",
