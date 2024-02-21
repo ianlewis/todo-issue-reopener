@@ -392,11 +392,19 @@ function reopenIssues(wd, issues, token, dryRun) {
             if (issueRef.todos.length === 0) {
                 continue;
             }
-            const resp = yield octokit.rest.issues.get({
-                owner: repo.owner,
-                repo: repo.repo,
-                issue_number: issueRef.issueID,
-            });
+            let resp;
+            try {
+                resp = yield octokit.rest.issues.get({
+                    owner: repo.owner,
+                    repo: repo.repo,
+                    issue_number: issueRef.issueID,
+                });
+            }
+            catch (e) {
+                const msg = String(e);
+                core.warning(`error getting issue ${issueRef.issueID}: ${msg}`);
+                continue;
+            }
             const issue = resp.data;
             if (issue.state === "open") {
                 continue;
