@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## X.Y.Z
+
+### Fixed in X.Y.Z
+
+- Fixed the "error updating to TUF remote mirror: invalid key" error
+  ([#688](https://github.com/ianlewis/todo-issue-reopener/issues/688)).
+
 ## [1.2.0] - 2024-02-21
 
 ### Fixed in 1.2.0
