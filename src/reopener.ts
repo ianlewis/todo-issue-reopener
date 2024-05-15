@@ -24,9 +24,10 @@ import * as config from "./config";
 import { env } from "process";
 
 const TODOS_VERSION = "v0.8.0";
-const SLSA_VERIFIER_VERSION = "v2.3.0";
+const SLSA_VERIFIER_VERSION = "v2.5.1";
+// See: https://github.com/slsa-framework/slsa-verifier/blob/main/SHA256SUM.md
 const SLSA_VERIFIER_SHA256SUM =
-  "ea687149d658efecda64d69da999efb84bb695a3212f29548d4897994027172d";
+  "54e4f40bf120bce1cef1ff123fef3456e8c526f315c47e22ed6acfe02a06b9a8";
 
 export class ReopenError extends Error {
   constructor(message: string) {
