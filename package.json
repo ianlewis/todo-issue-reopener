@@ -22,13 +22,15 @@
     "@actions/exec": "^1.1.1",
     "@actions/github": "^6.0.0",
     "@actions/tool-cache": "^2.0.1",
+    "uuid": "^7.0.3",
     "yaml": "^2.4.2"
   },
   "devDependencies": {
+    "@stylistic/eslint-plugin-ts": "^2.6.2",
     "@types/jest": "^29.5.12",
     "@types/node": "22.1.0",
-    "@typescript-eslint/eslint-plugin": "6.20.0",
-    "@typescript-eslint/parser": "6.20.0",
+    "@typescript-eslint/eslint-plugin": "8.0.1",
+    "@typescript-eslint/parser": "8.0.1",
     "@vercel/ncc": "0.38.1",
     "eslint": "8.57.0",
     "eslint-plugin-github": "4.10.2",
@@ -36,6 +38,6 @@
     "markdownlint-cli": "0.37.0",
     "prettier": "3.3.3",
     "ts-jest": "^29.2.4",
-    "typescript": "5.3.3"
+    "typescript": "5.5.4"
   }
 }

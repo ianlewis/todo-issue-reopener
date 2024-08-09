@@ -1,5 +1,8 @@
 {
-  "plugins": ["@typescript-eslint"],
+  "plugins": [
+    "@typescript-eslint",
+    "@stylistic/ts"
+  ],
   "extends": ["plugin:github/recommended"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -12,6 +15,8 @@
     "eslint-comments/no-use": "off",
     "import/no-namespace": "off",
     "no-unused-vars": "off",
+    "@stylistic/ts/func-call-spacing": ["error", "never"],
+    "@stylistic/ts/type-annotation-spacing": "error",
     "@typescript-eslint/no-unused-vars": "error",
     "@typescript-eslint/explicit-member-accessibility": ["error", {"accessibility": "no-public"}],
     "@typescript-eslint/no-require-imports": "error",
@@ -21,7 +26,6 @@
     "camelcase": "off",
     "@typescript-eslint/consistent-type-assertions": "error",
     "@typescript-eslint/explicit-function-return-type": ["error", {"allowExpressions": true}],
-    "@typescript-eslint/func-call-spacing": ["error", "never"],
     "@typescript-eslint/no-array-constructor": "error",
     "@typescript-eslint/no-empty-interface": "error",
     "@typescript-eslint/no-explicit-any": "error",
@@ -43,7 +47,6 @@
     "@typescript-eslint/require-array-sort-compare": "error",
     "@typescript-eslint/restrict-plus-operands": "error",
     "semi": "off",
-    "@typescript-eslint/type-annotation-spacing": "error",
     "@typescript-eslint/unbound-method": "error"
   },
   "env": {
