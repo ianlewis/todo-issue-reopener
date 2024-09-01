@@ -23,7 +23,7 @@
     "@actions/github": "^6.0.0",
     "@actions/tool-cache": "^2.0.1",
     "uuid": "^7.0.3",
-    "yaml": "^2.4.2"
+    "yaml": "^2.5.0"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin-ts": "^2.6.2",
