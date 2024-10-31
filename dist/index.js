@@ -266,7 +266,7 @@ const exec = __importStar(__nccwpck_require__(1514));
 const github = __importStar(__nccwpck_require__(5438));
 const verifier = __importStar(__nccwpck_require__(5122));
 const process_1 = __nccwpck_require__(7282);
-const TODOS_VERSION = "v0.9.0";
+const TODOS_VERSION = "v0.10.0";
 const SLSA_VERIFIER_VERSION = "v2.6.0";
 // See: https://github.com/slsa-framework/slsa-verifier/blob/main/SHA256SUM.md
 const SLSA_VERIFIER_SHA256SUM = "1c9c0d6a272063f3def6d233fa3372adbaff1f5a3480611a07c744e73246b62d";
