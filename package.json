@@ -22,7 +22,7 @@
     "@actions/exec": "^1.1.1",
     "@actions/github": "^6.0.0",
     "@actions/tool-cache": "^2.0.1",
-    "uuid": "^10.0.0",
+    "uuid": "^11.0.3",
     "yaml": "^2.6.0"
   },
   "devDependencies": {
