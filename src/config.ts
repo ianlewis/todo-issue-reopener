@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as fs from "fs/promises";
+import { readFile } from "fs/promises";
 
-import * as core from "@actions/core";
+import { debug } from "@actions/core";
 
 import YAML from "yaml";
 
@@ -25,9 +25,9 @@ export interface Config {
 export async function readConfig(configPath: string): Promise<Config> {
   let contents: string;
   try {
-    contents = await fs.readFile(configPath, { encoding: "utf8" });
+    contents = await readFile(configPath, { encoding: "utf8" });
   } catch (err) {
-    core.debug(`error reading "${configPath}": ${err}`);
+    debug(`error reading "${configPath}": ${err}`);
     return {};
   }
 

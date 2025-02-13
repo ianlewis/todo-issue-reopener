@@ -12,24 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as core from "@actions/core";
+import { getInput, setFailed } from "@actions/core";
 
-import * as reopener from "./reopener";
-import * as config from "./config";
+import { getTODOIssues, reopenIssues } from "./reopener";
+import { readConfig } from "./config";
 
 export async function runAction(): Promise<void> {
-  const wd = core.getInput("path", { required: true });
-  const token = core.getInput("token", { required: true });
-  const dryRun = core.getInput("dry-run") === "true";
-  const configPath = core.getInput("config-path", { required: true });
+  const wd = getInput("path", { required: true });
+  const token = getInput("token", { required: true });
+  const dryRun = getInput("dry-run") === "true";
+  const configPath = getInput("config-path", { required: true });
 
-  const conf = await config.readConfig(configPath);
+  const conf = await readConfig(configPath);
 
   try {
-    const issues = await reopener.getTODOIssues(wd, conf);
-    await reopener.reopenIssues(wd, issues, token, dryRun);
+    const issues = await getTODOIssues(wd, conf);
+    await reopenIssues(wd, issues, token, dryRun);
   } catch (err) {
     const message = err instanceof Error ? err.message : `${err}`;
-    core.setFailed(message);
+    setFailed(message);
   }
 }

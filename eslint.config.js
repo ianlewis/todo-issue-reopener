@@ -1,4 +1,3 @@
-// Copyright 2023 Google LLC
 // Copyright 2025 Ian Lewis
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { runAction } from "./action";
+import github from "eslint-plugin-github";
 
-runAction();
+export default [
+  github.getFlatConfigs().recommended,
+  ...github.getFlatConfigs().typescript,
+  {
+    files: ["**/*.{js,mjs,cjs,jsx,mjsx,ts,tsx,mtsx}"],
+    ignores: ['**/coverage', '**/dist', '**/linter', '**/node_modules'],
+    rules: {
+      'i18n-text/no-en': ['off'],
+      "github/array-foreach": "error",
+      "github/async-preventdefault": "warn",
+      "github/no-then": "error",
+      "github/no-blur": "error",
+    },
+  },
+];
