@@ -21,12 +21,3 @@ export const TODORef = reopener.TODORef;
 export const matchLabel = reopener.matchLabel;
 export const getTODOIssues = jest.fn<typeof reopener_types.getTODOIssues>();
 export const reopenIssues = jest.fn<typeof reopener_types.reopenIssues>();
-
-export default {
-  ReopenError,
-  TODORef,
-
-  matchLabel,
-  getTODOIssues,
-  reopenIssues,
-};

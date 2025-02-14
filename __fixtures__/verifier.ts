@@ -25,13 +25,3 @@ export const downloadSLSAVerifier =
   jest.fn<typeof verifier_types.downloadSLSAVerifier>();
 export const downloadAndVerifySLSA =
   jest.fn<typeof verifier_types.downloadAndVerifySLSA>();
-
-export default {
-  FileError,
-  DigestValidationError,
-  VerificationError,
-
-  validateFileDigest,
-  downloadSLSAVerifier,
-  downloadAndVerifySLSA,
-};
