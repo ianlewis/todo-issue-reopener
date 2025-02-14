@@ -424,9 +424,7 @@ describe("reopenIssues", () => {
       };
     });
 
-    await expect(
-      reopener.reopenIssues([], "", false),
-    ).resolves.toBeUndefined();
+    await expect(reopener.reopenIssues([], "", false)).resolves.toBeUndefined();
 
     expect(issues.get).not.toHaveBeenCalled();
     expect(issues.createComment).not.toHaveBeenCalled();

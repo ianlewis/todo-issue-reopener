@@ -67,11 +67,7 @@ describe("runAction", () => {
     await action.runAction();
 
     expect(reopener.getTODOIssues).toBeCalledWith(workspacePath, {});
-    expect(reopener.reopenIssues).toBeCalledWith(
-      [],
-      githubToken,
-      dryRun,
-    );
+    expect(reopener.reopenIssues).toBeCalledWith([], githubToken, dryRun);
 
     expect(core.setFailed).not.toHaveBeenCalled();
   });
@@ -146,11 +142,7 @@ describe("runAction", () => {
     await action.runAction();
 
     expect(reopener.getTODOIssues).toBeCalledWith(workspacePath, {});
-    expect(reopener.reopenIssues).toBeCalledWith(
-      [],
-      githubToken,
-      dryRun,
-    );
+    expect(reopener.reopenIssues).toBeCalledWith([], githubToken, dryRun);
 
     expect(core.setFailed).toBeCalledWith(errMsg);
   });
