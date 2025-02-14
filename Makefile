@@ -178,8 +178,8 @@ markdownlint: node_modules/.installed ## Runs the markdownlint linter.
 	@set -euo pipefail;\
 		files=$$( \
 			git ls-files \
-				'*.md' '**/*.md' \
-				'*.markdown' '**/*.markdown' \
+				'*.md' \
+				'*.markdown' \
 		); \
 		if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
 			exit_code=0; \
@@ -202,8 +202,8 @@ yamllint: .venv/.installed ## Runs the yamllint linter.
 		extraargs=""; \
 		files=$$( \
 			git ls-files \
-				'*.yml' '**/*.yml' \
-				'*.yaml' '**/*.yaml' \
+				'*.yml' \
+				'*.yaml' \
 		); \
 		if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
 			extraargs="-f github"; \
