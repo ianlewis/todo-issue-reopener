@@ -215,18 +215,18 @@ eslint: node_modules/.installed ## Runs eslint.
 	@set -euo pipefail; \
 		files=$$( \
 			git ls-files \
-				'src/*.ts' 'src/**/*.ts' \
-				'src/*.mts' 'src/**/*.mts' \
-				'src/*.js' 'src/**/*.js' \
-				'src/*.mjs' 'src/**/*.mjs' \
-				'__tests__/*.ts' '__tests__/**/*.ts' \
-				'__tests__/*.mts' '__tests__/**/*.mts' \
-				'__tests__/*.js' '__tests__/**/*.js' \
-				'__tests__/*.mjs' '__tests__/**/*.mjs' \
-				'__fixtures__/*.ts' '__fixtures__/**/*.ts' \
-				'__fixtures__/*.mts' '__fixtures__/**/*.mts' \
-				'__fixtures__/*.js' '__fixtures__/**/*.js' \
-				'__fixtures__/*.mjs' '__fixtures__/**/*.mjs' \
+				'src/*.ts' \
+				'src/*.mts' \
+				'src/*.js' \
+				'src/*.mjs' \
+				'__tests__/*.ts' \
+				'__tests__/*.mts' \
+				'__tests__/*.js' \
+				'__tests__/*.mjs' \
+				'__fixtures__/*.ts' \
+				'__fixtures__/*.mts' \
+				'__fixtures__/*.js' \
+				'__fixtures__/*.mjs' \
 		); \
 		if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
 			set -euo pipefail; \
