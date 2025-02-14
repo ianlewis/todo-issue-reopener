@@ -70,7 +70,7 @@ compile: node_modules/.installed ## Compile TypeScript.
 .PHONY: package
 package: compile ## Builds the distribution package.
 	@rm -rf dist
-	@npx rollup --config rollup.config.js --configPlugin @rollup/plugin-typescript
+	@npx rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript
 
 ## Tools
 #####################################################################
