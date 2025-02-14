@@ -11,29 +11,24 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 import * as core from "@actions/core";
-
 import * as reopener from "./reopener.js";
 import * as config from "./config.js";
-
-export async function runAction(): Promise<void> {
-  const wd = core.getInput("path", { required: true });
-  const token = core.getInput("token", { required: true });
-  const dryRun = core.getInput("dry-run") === "true";
-  const configPath = core.getInput("config-path", { required: true });
-
-  const conf = await config.readConfig(configPath);
-
-  try {
-    const issues = await reopener.getTODOIssues(wd, conf);
-    await reopener.reopenIssues(wd, issues, token, dryRun);
-  } catch (err) {
-    const message = err instanceof Error ? err.message : `${err}`;
-    core.setFailed(message);
-  }
+export async function runAction() {
+    const wd = core.getInput("path", { required: true });
+    const token = core.getInput("token", { required: true });
+    const dryRun = core.getInput("dry-run") === "true";
+    const configPath = core.getInput("config-path", { required: true });
+    const conf = await config.readConfig(configPath);
+    try {
+        const issues = await reopener.getTODOIssues(wd, conf);
+        await reopener.reopenIssues(wd, issues, token, dryRun);
+    }
+    catch (err) {
+        const message = err instanceof Error ? err.message : `${err}`;
+        core.setFailed(message);
+    }
 }
-
 export default {
-  runAction,
+    runAction,
 };

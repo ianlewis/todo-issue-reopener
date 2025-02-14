@@ -46,35 +46,31 @@ help: ## Shows all targets and help from the Makefile (this message).
 		}'
 
 package-lock.json:
-	npm install
+	@npm install
 
 node_modules/.installed: package.json package-lock.json
-	npm ci
-	touch node_modules/.installed
+	@npm ci
+	@touch node_modules/.installed
 
 .venv/bin/activate:
-	python -m venv .venv
+	@python -m venv .venv
 
 .venv/.installed: .venv/bin/activate requirements.txt
-	./.venv/bin/pip install -r requirements.txt --require-hashes
-	touch .venv/.installed
+	@./.venv/bin/pip install -r requirements.txt --require-hashes
+	@touch .venv/.installed
 
 ## Build
 #####################################################################
 
-.PHONY: action
-action: node_modules/.installed ## Builds the action.
-	rm -rf lib
-	npm run build
+.PHONY: compile
+compile: node_modules/.installed ## Compile TypeScript.
+	@rm -rf lib
+	@npx tsc -p ./tsconfig.json
 
 .PHONY: package
-package: action ## Builds the distribution package.
-	rm -rf dist
-	npm run package
-
-.PHONY: compile
-compile: ## Compile TypeScript.
-	@npx tsc
+package: compile ## Builds the distribution package.
+	@rm -rf dist
+	@npx rollup --config rollup.config.js --configPlugin @rollup/plugin-typescript
 
 ## Tools
 #####################################################################
@@ -86,7 +82,9 @@ license-headers: ## Update license headers.
 			git ls-files \
 				'*.go' '**/*.go' \
 				'*.ts' '**/*.ts' \
+				'*.mts' '**/*.mts' \
 				'*.js' '**/*.js' \
+				'*.mjs' '**/*.mjs' \
 				'*.py' '**/*.py' \
 				'*.yaml' '**/*.yaml' \
 				'*.yml' '**/*.yml' \
@@ -136,6 +134,7 @@ js-format: node_modules/.installed ## Format YAML files.
 		files=$$( \
 			git ls-files \
 				'*.js' '**/*.js' \
+				'*.mjs' '**/*.mjs' \
 				'*.javascript' '**/*.javascript' \
 		); \
 		npx prettier --write --no-error-on-unmatched-pattern $${files}
@@ -146,7 +145,7 @@ ts-format: node_modules/.installed ## Format YAML files.
 		files=$$( \
 			git ls-files \
 				'*.ts' '**/*.ts' \
-				'*.typescript' '**/*.typescript' \
+				'*.mts' '**/*.mts' \
 		); \
 		npx prettier --write --no-error-on-unmatched-pattern $${files}
 
@@ -154,10 +153,9 @@ ts-format: node_modules/.installed ## Format YAML files.
 #####################################################################
 
 .PHONY: unit-test
-unit-test: node_modules/.installed ## Runs all unit tests.
+unit-test: compile ## Runs all unit tests.
 	# NOTE: Make sure the package builds.
-	npm run build
-	npm run test
+	@NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 npx jest
 
 ## Linters
 #####################################################################
@@ -223,9 +221,13 @@ eslint: node_modules/.installed ## Runs eslint.
 		files=$$( \
 			git ls-files \
 				'src/*.ts' 'src/**/*.ts' \
+				'src/*.mts' 'src/**/*.mts' \
 				'src/*.js' 'src/**/*.js' \
+				'src/*.mjs' 'src/**/*.mjs' \
 				'__tests__/*.ts' '__tests__/**/*.ts' \
+				'__tests__/*.mts' '__tests__/**/*.mts' \
 				'__tests__/*.js' '__tests__/**/*.js' \
+				'__tests__/*.mjs' '__tests__/**/*.mjs' \
 		); \
 		if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
 			set -euo pipefail; \

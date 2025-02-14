@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createHash } from "crypto";
-import { access, readFile, chmod } from "fs/promises";
+import crypto from "crypto";
+import fs from "fs/promises";
 
-import { debug } from "@actions/core";
-import { getExecOutput } from "@actions/exec";
-import { downloadTool } from "@actions/tool-cache";
+import * as core from "@actions/core";
+import * as exec from "@actions/exec";
+import * as tc from "@actions/tool-cache";
 
 export class FileError extends Error {
   constructor(filePath: string, message: string) {
@@ -46,17 +46,18 @@ export async function validateFileDigest(
   filePath: string,
   expectedDigest: string,
 ): Promise<void> {
-  debug(`Validating file digest: ${filePath}`);
+  core.debug(`Validating file digest: ${filePath}`);
 
-  debug(`Expected digest for ${filePath}: ${expectedDigest}`);
+  core.debug(`Expected digest for ${filePath}: ${expectedDigest}`);
 
   let computedDigest: string;
   try {
     // Verify that the file exists.
-    await access(filePath);
+    await fs.access(filePath);
 
-    const untrustedContents = await readFile(filePath);
-    computedDigest = createHash("sha256")
+    const untrustedContents = await fs.readFile(filePath);
+    computedDigest = crypto
+      .createHash("sha256")
       .update(untrustedContents)
       .digest("hex");
   } catch (err) {
@@ -64,13 +65,13 @@ export async function validateFileDigest(
     throw new FileError(filePath, message);
   }
 
-  debug(`Computed digest for ${filePath}: ${computedDigest}`);
+  core.debug(`Computed digest for ${filePath}: ${computedDigest}`);
 
   if (computedDigest !== expectedDigest) {
     throw new DigestValidationError(filePath, expectedDigest, computedDigest);
   }
 
-  debug(`Digest for ${filePath} validated`);
+  core.debug(`Digest for ${filePath} validated`);
 }
 
 // downloadSLSAVerifier downloads the slsa-verifier binary, verifies it against
@@ -79,21 +80,21 @@ export async function downloadSLSAVerifier(
   version: string,
   digest: string,
 ): Promise<string> {
-  debug(`Downloading slsa-verifier ${version}`);
+  core.debug(`Downloading slsa-verifier ${version}`);
 
   // Download the slsa-verifier binary.
-  const verifierPath = await downloadTool(
+  const verifierPath = await tc.downloadTool(
     `https://github.com/slsa-framework/slsa-verifier/releases/download/${version}/slsa-verifier-linux-amd64`,
   );
 
-  debug(`Downloaded slsa-verifier to ${verifierPath}`);
+  core.debug(`Downloaded slsa-verifier to ${verifierPath}`);
 
   // Validate the checksum.
   await validateFileDigest(verifierPath, digest);
 
-  debug(`Setting ${verifierPath} as executable`);
+  core.debug(`Setting ${verifierPath} as executable`);
 
-  await chmod(verifierPath, 0o700);
+  await fs.chmod(verifierPath, 0o700);
 
   return verifierPath;
 }
@@ -122,21 +123,21 @@ export async function downloadAndVerifySLSA(
     slsaVerifierDigest,
   );
 
-  debug(`Downloading ${url}`);
-  const artifactPromise = downloadTool(url);
+  core.debug(`Downloading ${url}`);
+  const artifactPromise = tc.downloadTool(url);
 
-  debug(`Downloading ${provenanceURL}`);
-  const provenancePromise = downloadTool(provenanceURL);
+  core.debug(`Downloading ${provenanceURL}`);
+  const provenancePromise = tc.downloadTool(provenanceURL);
 
   const verifierPath = await verifierPromise;
   const artifactPath = await artifactPromise;
-  debug(`Downloaded ${url} to ${artifactPath}`);
+  core.debug(`Downloaded ${url} to ${artifactPath}`);
   const provenancePath = await provenancePromise;
-  debug(`Downloaded ${provenanceURL} to ${provenancePath}`);
+  core.debug(`Downloaded ${provenanceURL} to ${provenancePath}`);
 
-  debug(`Running slsa-verifier (${verifierPath})`);
+  core.debug(`Running slsa-verifier (${verifierPath})`);
 
-  const { exitCode, stdout, stderr } = await getExecOutput(
+  const { exitCode, stdout, stderr } = await exec.getExecOutput(
     verifierPath,
     [
       "verify-artifact",
@@ -151,10 +152,20 @@ export async function downloadAndVerifySLSA(
     { ignoreReturnCode: true },
   );
 
-  debug(`Ran slsa-verifier (${verifierPath}): ${stdout}`);
+  core.debug(`Ran slsa-verifier (${verifierPath}): ${stdout}`);
   if (exitCode !== 0) {
     throw new VerificationError(`slsa-verifier exited ${exitCode}: ${stderr}`);
   }
 
   return artifactPath;
 }
+
+export default {
+  FileError,
+  DigestValidationError,
+  VerificationError,
+
+  validateFileDigest,
+  downloadSLSAVerifier,
+  downloadAndVerifySLSA,
+};

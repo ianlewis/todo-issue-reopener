@@ -12,13 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as fs from "fs";
-import * as os from "os";
-import * as path from "path";
+import { jest } from "@jest/globals";
+
+import fs from "fs";
+import os from "os";
+import path from "path";
 
 import YAML from "yaml";
 
-import * as config from "../src/config";
+// eslint-disable-next-line import/no-namespace
+import * as core from "../__fixtures__/core.js";
+
+// Mocks should be declared before the module being tested is imported.
+jest.unstable_mockModule("@actions/core", () => core);
+
+const config = await import("../src/config.js");
 
 describe("readConfig", () => {
   it("handles non-existant config", async () => {

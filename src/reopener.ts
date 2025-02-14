@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as fs from "fs/promises";
-import * as path from "path";
+import fs from "fs/promises";
+import path from "path";
 
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as github from "@actions/github";
 
-import * as verifier from "./verifier";
-import * as config from "./config";
+import * as verifier from "./verifier.js";
+import * as config from "./config.js";
 import { env } from "process";
 
 const TODOS_VERSION = "v0.10.0";
@@ -260,3 +260,12 @@ export async function reopenIssues(
     });
   }
 }
+
+export default {
+  ReopenError,
+  TODORef,
+
+  matchLabel,
+  getTODOIssues,
+  reopenIssues,
+};

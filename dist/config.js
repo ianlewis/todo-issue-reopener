@@ -1,5 +1,4 @@
 // Copyright 2023 Google LLC
-// Copyright 2025 Ian Lewis
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +11,24 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-import { runAction } from "./action";
-
-runAction();
+import { readFile } from "fs/promises";
+import { debug } from "@actions/core";
+import YAML from "yaml";
+export async function readConfig(configPath) {
+    let contents;
+    try {
+        contents = await readFile(configPath, { encoding: "utf8" });
+    }
+    catch (err) {
+        debug(`error reading "${configPath}": ${err}`);
+        return {};
+    }
+    const config = YAML.parse(contents);
+    if (!config) {
+        return {};
+    }
+    return config;
+}
+export default {
+    readConfig,
+};
