@@ -24,7 +24,7 @@ import YAML from "yaml";
 export interface Config {
   /**
    * vanityURLs is a list of regex strings to match against vanity issue URLs.
-   */ 
+   */
   vanityURLs?: string[];
 }
 

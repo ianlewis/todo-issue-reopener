@@ -31,7 +31,7 @@ const SLSA_VERIFIER_SHA256SUM =
 
 /**
  * ReopenError represents an error that occurred when reopening an issue.
- */ 
+ */
 export class ReopenError extends Error {
   constructor(message: string) {
     super(message);

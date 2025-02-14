@@ -1,13 +1,26 @@
-import reopener from '../src/reopener.js'
-import type * as reopener_types from '../src/reopener.js'
-import { jest } from '@jest/globals'
+// Copyright 2025 Ian Lewis
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-export const ReopenError = reopener.ReopenError
-export const TODORef = reopener.TODORef
-export const matchLabel = reopener.matchLabel
-export const getTODOIssues = jest.fn<typeof reopener_types.getTODOIssues>()
-export const reopenIssues = jest.fn<typeof reopener_types.reopenIssues>()
+import reopener from "../src/reopener.js";
+import type * as reopener_types from "../src/reopener.js";
+import { jest } from "@jest/globals";
 
+export const ReopenError = reopener.ReopenError;
+export const TODORef = reopener.TODORef;
+export const matchLabel = reopener.matchLabel;
+export const getTODOIssues = jest.fn<typeof reopener_types.getTODOIssues>();
+export const reopenIssues = jest.fn<typeof reopener_types.reopenIssues>();
 
 export default {
   ReopenError,
@@ -16,4 +29,4 @@ export default {
   matchLabel,
   getTODOIssues,
   reopenIssues,
-}
+};

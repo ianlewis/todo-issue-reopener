@@ -80,14 +80,10 @@ license-headers: ## Update license headers.
 	@set -euo pipefail; \
 		files=$$( \
 			git ls-files \
-				'*.go' '**/*.go' \
-				'*.ts' '**/*.ts' \
-				'*.mts' '**/*.mts' \
-				'*.js' '**/*.js' \
-				'*.mjs' '**/*.mjs' \
-				'*.py' '**/*.py' \
-				'*.yaml' '**/*.yaml' \
-				'*.yml' '**/*.yml' \
+				':(glob)*.ts' 'src/*.ts' '__tests__/*.ts' '__fixtures__/*.ts' \
+				':(glob)*.mts' 'src/*.mts' '__tests__/*.mts' '__fixtures__/*.mts' \
+				':(glob)*.js' 'src/*.js' '__tests__/*.js'  '__fixtures__/*.js' \
+				':(glob)*.mjs' 'src/*.mjs' '__tests__/*.mjs' '__fixtures__/*.mjs' \
 				'Makefile' \
 		); \
 		name=$$(git config user.name); \
@@ -113,8 +109,8 @@ md-format: node_modules/.installed ## Format Markdown files.
 	@set -euo pipefail; \
 		files=$$( \
 			git ls-files \
-				'*.md' '**/*.md' \
-				'*.markdown' '**/*.markdown' \
+				'*.md' \
+				'*.markdown' \
 		); \
 		npx prettier --write --no-error-on-unmatched-pattern $${files}
 
@@ -123,8 +119,8 @@ yaml-format: node_modules/.installed ## Format YAML files.
 	@set -euo pipefail; \
 		files=$$( \
 			git ls-files \
-				'*.yml' '**/*.yml' \
-				'*.yaml' '**/*.yaml' \
+				'*.yml' \
+				'*.yaml' \
 		); \
 		npx prettier --write --no-error-on-unmatched-pattern $${files}
 
@@ -133,9 +129,8 @@ js-format: node_modules/.installed ## Format YAML files.
 	@set -euo pipefail; \
 		files=$$( \
 			git ls-files \
-				'*.js' '**/*.js' \
-				'*.mjs' '**/*.mjs' \
-				'*.javascript' '**/*.javascript' \
+				':(glob)*.js' 'src/*.js' '__tests__/*.js'  '__fixtures__/*.js' \
+				':(glob)*.mjs' 'src/*.mjs' '__tests__/*.mjs' '__fixtures__/*.mjs' \
 		); \
 		npx prettier --write --no-error-on-unmatched-pattern $${files}
 
@@ -144,8 +139,8 @@ ts-format: node_modules/.installed ## Format YAML files.
 	@set -euo pipefail; \
 		files=$$( \
 			git ls-files \
-				'*.ts' '**/*.ts' \
-				'*.mts' '**/*.mts' \
+				':(glob)*.ts' 'src/*.ts' '__tests__/*.ts' '__fixtures__/*.ts' \
+				':(glob)*.mts' 'src/*.mts' '__tests__/*.mts' '__fixtures__/*.mts' \
 		); \
 		npx prettier --write --no-error-on-unmatched-pattern $${files}
 
@@ -228,6 +223,10 @@ eslint: node_modules/.installed ## Runs eslint.
 				'__tests__/*.mts' '__tests__/**/*.mts' \
 				'__tests__/*.js' '__tests__/**/*.js' \
 				'__tests__/*.mjs' '__tests__/**/*.mjs' \
+				'__fixtures__/*.ts' '__fixtures__/**/*.ts' \
+				'__fixtures__/*.mts' '__fixtures__/**/*.mts' \
+				'__fixtures__/*.js' '__fixtures__/**/*.js' \
+				'__fixtures__/*.mjs' '__fixtures__/**/*.mjs' \
 		); \
 		if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
 			set -euo pipefail; \
