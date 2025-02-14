@@ -25,7 +25,7 @@ export async function runAction() {
     const conf = await config.readConfig(configPath);
     try {
         const issues = await reopener.getTODOIssues(wd, conf);
-        await reopener.reopenIssues(wd, issues, token, dryRun);
+        await reopener.reopenIssues(issues, token, dryRun);
     }
     catch (err) {
         const message = err instanceof Error ? err.message : `${err}`;

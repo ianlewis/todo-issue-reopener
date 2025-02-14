@@ -35,6 +35,3 @@ export async function readConfig(configPath) {
     }
     return config;
 }
-export default {
-    readConfig,
-};

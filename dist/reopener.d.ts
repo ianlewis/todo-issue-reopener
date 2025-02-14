@@ -42,9 +42,8 @@ export declare function matchLabel(label: string, conf: config.Config): number;
 export declare function getTODOIssues(wd: string, conf: config.Config): Promise<TODOIssue[]>;
 /**
  * reopenIssues is an async function that reopens issues linked to TODOs.
- * @param {string} wd The working directory.
  * @param {TODOIssue[]} issues The issues and associate TODOs.
  * @param {string} token The GITHUB_TOKEN to authenticate with.
  * @param {boolean} dryRun true if running in dry-run mode.
  */
-export declare function reopenIssues(w: string, issues: TODOIssue[], token: string, dryRun: boolean): Promise<void>;
+export declare function reopenIssues(issues: TODOIssue[], token: string, dryRun: boolean): Promise<void>;

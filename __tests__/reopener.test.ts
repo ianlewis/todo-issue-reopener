@@ -424,10 +424,8 @@ describe("reopenIssues", () => {
       };
     });
 
-    const wd = process.env.GITHUB_WORKSPACE as string;
-
     await expect(
-      reopener.reopenIssues(wd, [], "", false),
+      reopener.reopenIssues([], "", false),
     ).resolves.toBeUndefined();
 
     expect(issues.get).not.toHaveBeenCalled();
@@ -447,13 +445,11 @@ describe("reopenIssues", () => {
       };
     });
 
-    const wd = process.env.GITHUB_WORKSPACE as string;
-
     // NOTE: todoIssue.todos is empty.
     const todoIssue = new reopener.TODOIssue(123);
 
     await expect(
-      reopener.reopenIssues(wd, [todoIssue], "", false),
+      reopener.reopenIssues([todoIssue], "", false),
     ).resolves.toBeUndefined();
 
     expect(issues.get).not.toHaveBeenCalled();
@@ -475,13 +471,11 @@ describe("reopenIssues", () => {
       };
     });
 
-    const wd = process.env.GITHUB_WORKSPACE as string;
-
     const todoIssue = new reopener.TODOIssue(123);
     todoIssue.todos.push(new reopener.TODORef());
 
     await expect(
-      reopener.reopenIssues(wd, [todoIssue], "", false),
+      reopener.reopenIssues([todoIssue], "", false),
     ).resolves.toBeUndefined();
 
     expect(issues.get).toHaveBeenCalled();
@@ -507,12 +501,11 @@ describe("reopenIssues", () => {
       };
     });
 
-    const wd = process.env.GITHUB_WORKSPACE as string;
     const todoIssue = new reopener.TODOIssue(123);
     todoIssue.todos.push(new reopener.TODORef());
 
     await expect(
-      reopener.reopenIssues(wd, [todoIssue], "", false),
+      reopener.reopenIssues([todoIssue], "", false),
     ).resolves.toBeUndefined();
 
     expect(issues.get).toHaveBeenCalledTimes(1);
@@ -538,15 +531,13 @@ describe("reopenIssues", () => {
       };
     });
 
-    const wd = process.env.GITHUB_WORKSPACE as string;
-
     const todoIssue = new reopener.TODOIssue(123);
     // NOTE: multiple TODO references.
     todoIssue.todos.push(new reopener.TODORef());
     todoIssue.todos.push(new reopener.TODORef());
 
     await expect(
-      reopener.reopenIssues(wd, [todoIssue], "", false),
+      reopener.reopenIssues([todoIssue], "", false),
     ).resolves.toBeUndefined();
 
     expect(issues.get).toHaveBeenCalledTimes(1);
@@ -572,8 +563,6 @@ describe("reopenIssues", () => {
       };
     });
 
-    const wd = process.env.GITHUB_WORKSPACE as string;
-
     const todoIssue = new reopener.TODOIssue(123);
     // NOTE: multiple TODO references.
     todoIssue.todos.push(new reopener.TODORef());
@@ -581,7 +570,7 @@ describe("reopenIssues", () => {
 
     await expect(
       // NOTE: dry-run = true
-      reopener.reopenIssues(wd, [todoIssue], "", true),
+      reopener.reopenIssues([todoIssue], "", true),
     ).resolves.toBeUndefined();
 
     expect(issues.get).toHaveBeenCalledTimes(1);
@@ -607,8 +596,6 @@ describe("reopenIssues", () => {
       };
     });
 
-    const wd = process.env.GITHUB_WORKSPACE as string;
-
     const todoIssue1 = new reopener.TODOIssue(123);
     todoIssue1.todos.push(new reopener.TODORef());
     todoIssue1.todos.push(new reopener.TODORef());
@@ -617,7 +604,7 @@ describe("reopenIssues", () => {
     todoIssue2.todos.push(new reopener.TODORef());
 
     await expect(
-      reopener.reopenIssues(wd, [todoIssue1, todoIssue2], "", false),
+      reopener.reopenIssues([todoIssue1, todoIssue2], "", false),
     ).resolves.toBeUndefined();
 
     expect(issues.get).toHaveBeenCalledTimes(2);

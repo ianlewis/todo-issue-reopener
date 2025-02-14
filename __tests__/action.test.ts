@@ -68,7 +68,6 @@ describe("runAction", () => {
 
     expect(reopener.getTODOIssues).toBeCalledWith(workspacePath, {});
     expect(reopener.reopenIssues).toBeCalledWith(
-      workspacePath,
       [],
       githubToken,
       dryRun,
@@ -148,7 +147,6 @@ describe("runAction", () => {
 
     expect(reopener.getTODOIssues).toBeCalledWith(workspacePath, {});
     expect(reopener.reopenIssues).toBeCalledWith(
-      workspacePath,
       [],
       githubToken,
       dryRun,

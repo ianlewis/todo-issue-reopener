@@ -196,13 +196,11 @@ export async function getTODOIssues(
 
 /**
  * reopenIssues is an async function that reopens issues linked to TODOs.
- * @param {string} wd The working directory.
  * @param {TODOIssue[]} issues The issues and associate TODOs.
  * @param {string} token The GITHUB_TOKEN to authenticate with.
  * @param {boolean} dryRun true if running in dry-run mode.
  */
 export async function reopenIssues(
-  w: string,
   issues: TODOIssue[],
   token: string,
   dryRun: boolean,

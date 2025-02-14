@@ -147,12 +147,11 @@ export async function getTODOIssues(wd, conf) {
 }
 /**
  * reopenIssues is an async function that reopens issues linked to TODOs.
- * @param {string} wd The working directory.
  * @param {TODOIssue[]} issues The issues and associate TODOs.
  * @param {string} token The GITHUB_TOKEN to authenticate with.
  * @param {boolean} dryRun true if running in dry-run mode.
  */
-export async function reopenIssues(w, issues, token, dryRun) {
+export async function reopenIssues(issues, token, dryRun) {
     const octokit = github.getOctokit(token);
     const repo = github.context.repo;
     const sha = github.context.sha;
