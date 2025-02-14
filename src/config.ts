@@ -49,7 +49,3 @@ export async function readConfig(configPath: string): Promise<Config> {
   }
   return config;
 }
-
-export default {
-  readConfig,
-};
