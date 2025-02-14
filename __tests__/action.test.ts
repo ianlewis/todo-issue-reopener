@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as fs from "fs";
-import * as os from "os";
-import * as path from "path";
+import { jest } from "@jest/globals";
 
-const reopener = require("../src/reopener");
+import * as core from "../__fixtures__/core.js";
+import * as reopener from "../__fixtures__/reopener.js";
 
-import * as action from "../src/action";
+// Mocks should be declared before the module being tested is imported.
+jest.unstable_mockModule("@actions/core", () => core);
+jest.unstable_mockModule("../src/reopener.js", () => reopener);
 
-jest.mock("../src/reopener");
+const action = await import("../src/action.js");
 
 describe("runAction", () => {
   const env = process.env;
@@ -43,66 +44,106 @@ describe("runAction", () => {
     const configPath = ".todos.yml";
     const dryRun = false;
 
-    process.env.INPUT_PATH = workspacePath;
-    process.env.INPUT_TOKEN = githubToken;
-    process.env["INPUT_CONFIG-PATH"] = configPath;
-    process.env["INPUT_DRY-RUN"] = String(dryRun);
+    core.getInput.mockImplementation(
+      (name: string, _options?: core.InputOptions): string => {
+        switch (name) {
+          case "path":
+            return workspacePath;
+            break;
+          case "token":
+            return githubToken;
+            break;
+          case "config-path":
+            return configPath;
+            break;
+          case "dry-run":
+            return String(dryRun);
+            break;
+        }
+        return "";
+      },
+    );
 
     await action.runAction();
 
     expect(reopener.getTODOIssues).toBeCalledWith(workspacePath, {});
-    expect(reopener.reopenIssues).toBeCalledWith(
-      workspacePath,
-      [],
-      githubToken,
-      dryRun,
-    );
-    expect(process.exitCode).toBeUndefined();
+    expect(reopener.reopenIssues).toBeCalledWith([], githubToken, dryRun);
+
+    expect(core.setFailed).not.toHaveBeenCalled();
   });
 
   it("handles getTODOIssues failure", async () => {
-    reopener.getTODOIssues.mockRejectedValueOnce(new Error("test error"));
+    const errMsg = "test error";
+    reopener.getTODOIssues.mockRejectedValueOnce(new Error(errMsg));
 
     const workspacePath = "/home/user";
     const githubToken = "deadbeef";
     const configPath = ".todos.yml";
     const dryRun = false;
 
-    process.env.INPUT_PATH = workspacePath;
-    process.env.INPUT_TOKEN = githubToken;
-    process.env["INPUT_CONFIG-PATH"] = configPath;
-    process.env["INPUT_DRY-RUN"] = String(dryRun);
+    core.getInput.mockImplementation(
+      (name: string, _options?: core.InputOptions): string => {
+        switch (name) {
+          case "path":
+            return workspacePath;
+            break;
+          case "token":
+            return githubToken;
+            break;
+          case "config-path":
+            return configPath;
+            break;
+          case "dry-run":
+            return String(dryRun);
+            break;
+        }
+        return "";
+      },
+    );
 
     await action.runAction();
 
     expect(reopener.getTODOIssues).toBeCalledWith(workspacePath, {});
+    expect(reopener.reopenIssues).not.toHaveBeenCalled();
 
-    expect(process.exitCode).not.toBe(0);
+    expect(core.setFailed).toBeCalledWith(errMsg);
   });
 
   it("handles reopenIssues failure", async () => {
+    const errMsg = "test error";
     reopener.getTODOIssues.mockResolvedValueOnce([]);
-    reopener.reopenIssues.mockRejectedValueOnce(new Error("test error"));
+    reopener.reopenIssues.mockRejectedValueOnce(new Error(errMsg));
 
     const workspacePath = "/home/user";
     const githubToken = "deadbeef";
     const configPath = ".todos.yml";
     const dryRun = false;
 
-    process.env.INPUT_PATH = workspacePath;
-    process.env.INPUT_TOKEN = githubToken;
-    process.env["INPUT_CONFIG-PATH"] = configPath;
-    process.env["INPUT_DRY-RUN"] = String(dryRun);
+    core.getInput.mockImplementation(
+      (name: string, _options?: core.InputOptions): string => {
+        switch (name) {
+          case "path":
+            return workspacePath;
+            break;
+          case "token":
+            return githubToken;
+            break;
+          case "config-path":
+            return configPath;
+            break;
+          case "dry-run":
+            return String(dryRun);
+            break;
+        }
+        return "";
+      },
+    );
 
     await action.runAction();
 
     expect(reopener.getTODOIssues).toBeCalledWith(workspacePath, {});
-    expect(reopener.reopenIssues).toBeCalledWith(
-      workspacePath,
-      [],
-      githubToken,
-      dryRun,
-    );
-    expect(process.exitCode).not.toBe(0);
+    expect(reopener.reopenIssues).toBeCalledWith([], githubToken, dryRun);
+
+    expect(core.setFailed).toBeCalledWith(errMsg);
   });
 });

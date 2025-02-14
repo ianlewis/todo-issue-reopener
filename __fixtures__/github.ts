@@ -1,4 +1,4 @@
-// Copyright 2023 Google LLC
+// Copyright 2025 Ian Lewis
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,6 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as action from "./action";
+import { jest } from "@jest/globals";
 
-action.runAction();
+export const getOctokit = jest.fn();
+export const context = {
+  repo: {
+    owner: "",
+    repo: "",
+  },
+  sha: "",
+};

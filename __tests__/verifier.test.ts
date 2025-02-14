@@ -12,18 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as fs from "fs";
-import * as os from "os";
-import * as path from "path";
+import { jest } from "@jest/globals";
 
-// NOTE: must use require for mock to work.
-const exec = require("@actions/exec");
-const tc = require("@actions/tool-cache");
+import fs from "fs";
+import os from "os";
+import path from "path";
 
-import * as verifier from "../src/verifier";
+import * as core from "../__fixtures__/core.js";
+import * as exec from "../__fixtures__/exec.js";
+import * as tc from "../__fixtures__/tool-cache.js";
 
-jest.mock("@actions/exec");
-jest.mock("@actions/tool-cache");
+jest.unstable_mockModule("@actions/core", () => core);
+jest.unstable_mockModule("@actions/exec", () => exec);
+jest.unstable_mockModule("@actions/tool-cache", () => tc);
+
+const verifier = await import("../src/verifier.js");
 
 describe("validateFileDigest", () => {
   it("validates a file digest", async () => {
@@ -119,7 +122,7 @@ describe("downloadSLSAVerifier", () => {
   });
 
   it("fails with http error", async () => {
-    tc.downloadTool.mockRejectedValueOnce(new tc.HTTPError("foo"));
+    tc.downloadTool.mockRejectedValueOnce(new tc.HTTPError(403));
 
     await expect(
       verifier.downloadSLSAVerifier(

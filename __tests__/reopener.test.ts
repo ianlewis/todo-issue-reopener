@@ -12,20 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as fs from "fs";
-import * as os from "os";
-import * as path from "path";
+import { jest } from "@jest/globals";
 
-// NOTE: must use require for mock to work.
-const exec = require("@actions/exec");
-const github = require("@actions/github");
+import fs from "fs";
+import os from "os";
+import path from "path";
 
-const verifier = require("../src/verifier");
-import * as reopener from "../src/reopener";
+import * as core from "../__fixtures__/core.js";
+import * as exec from "../__fixtures__/exec.js";
+import * as github from "../__fixtures__/github.js";
+import * as tc from "../__fixtures__/tool-cache.js";
+import * as verifier from "../__fixtures__/verifier.js";
 
-jest.mock("@actions/exec");
-jest.mock("@actions/github");
-jest.mock("../src/verifier");
+jest.unstable_mockModule("@actions/core", () => core);
+jest.unstable_mockModule("@actions/exec", () => exec);
+jest.unstable_mockModule("@actions/github", () => github);
+jest.unstable_mockModule("@actions/tool-cache", () => tc);
+jest.unstable_mockModule("../src/verifier.js", () => verifier);
+
+const reopener = await import("../src/reopener.js");
 
 describe("TODORef", () => {
   it("constructs", async () => {
@@ -68,7 +73,7 @@ describe("getTODOIssues", () => {
     // git rev-parse --show-top-level
     exec.getExecOutput.mockResolvedValueOnce({
       exitCode: 0,
-      stdout: workspacePath + "\n",
+      stdout: `${workspacePath}\n`,
       stderr: "",
     });
 
@@ -96,7 +101,7 @@ describe("getTODOIssues", () => {
     // git rev-parse --show-top-level
     exec.getExecOutput.mockResolvedValueOnce({
       exitCode: 0,
-      stdout: workspacePath + "\n",
+      stdout: `${workspacePath}\n`,
       stderr: "",
     });
 
@@ -124,7 +129,7 @@ describe("getTODOIssues", () => {
     // git rev-parse --show-top-level
     exec.getExecOutput.mockResolvedValueOnce({
       exitCode: 0,
-      stdout: workspacePath + "\n",
+      stdout: `${workspacePath}\n`,
       stderr: "",
     });
 
@@ -152,7 +157,7 @@ describe("getTODOIssues", () => {
     // git rev-parse --show-top-level
     exec.getExecOutput.mockResolvedValueOnce({
       exitCode: 0,
-      stdout: workspacePath + "\n",
+      stdout: `${workspacePath}\n`,
       stderr: "",
     });
 
@@ -180,7 +185,7 @@ describe("getTODOIssues", () => {
     // git rev-parse --show-top-level
     exec.getExecOutput.mockResolvedValueOnce({
       exitCode: 0,
-      stdout: workspacePath + "\n",
+      stdout: `${workspacePath}\n`,
       stderr: "",
     });
 
@@ -191,9 +196,9 @@ describe("getTODOIssues", () => {
       stderr: "",
     });
 
-    let p = reopener.getTODOIssues(workspacePath, {});
+    const p = reopener.getTODOIssues(workspacePath, {});
     await expect(p).resolves.toHaveLength(1);
-    let issues = await p;
+    const issues = await p;
 
     expect(issues[0].todos).toHaveLength(1);
     expect(issues[0].issueID).toBe(123);
@@ -212,7 +217,7 @@ describe("getTODOIssues", () => {
     // git rev-parse --show-top-level
     exec.getExecOutput.mockResolvedValueOnce({
       exitCode: 0,
-      stdout: workspacePath + "\n",
+      stdout: `${workspacePath}\n`,
       stderr: "",
     });
 
@@ -223,9 +228,9 @@ describe("getTODOIssues", () => {
       stderr: "",
     });
 
-    let p = reopener.getTODOIssues(workspacePath, {});
+    const p = reopener.getTODOIssues(workspacePath, {});
     await expect(p).resolves.toHaveLength(1);
-    let issues = await p;
+    const issues = await p;
 
     expect(issues[0].todos).toHaveLength(1);
     expect(issues[0].issueID).toBe(123);
@@ -244,7 +249,7 @@ describe("getTODOIssues", () => {
     // git rev-parse --show-top-level
     exec.getExecOutput.mockResolvedValueOnce({
       exitCode: 0,
-      stdout: workspacePath + "\n",
+      stdout: `${workspacePath}\n`,
       stderr: "",
     });
 
@@ -255,9 +260,9 @@ describe("getTODOIssues", () => {
       stderr: "",
     });
 
-    let p = reopener.getTODOIssues(workspacePath, {});
+    const p = reopener.getTODOIssues(workspacePath, {});
     await expect(p).resolves.toHaveLength(1);
-    let issues = await p;
+    const issues = await p;
 
     expect(issues[0].todos).toHaveLength(1);
     expect(issues[0].issueID).toBe(123);
@@ -276,7 +281,7 @@ describe("getTODOIssues", () => {
     // git rev-parse --show-top-level
     exec.getExecOutput.mockResolvedValueOnce({
       exitCode: 0,
-      stdout: workspacePath + "\n",
+      stdout: `${workspacePath}\n`,
       stderr: "",
     });
 
@@ -287,15 +292,15 @@ describe("getTODOIssues", () => {
       stderr: "",
     });
 
-    let p = reopener.getTODOIssues(workspacePath, {});
+    const p = reopener.getTODOIssues(workspacePath, {});
     await expect(p).resolves.toHaveLength(2);
-    let issues = await p;
+    const issues = await p;
 
-    const issue123 = issues.find((i) => i.issueID == 123);
+    const issue123 = issues.find((i) => i.issueID === 123);
     expect(issue123).toBeDefined();
     expect(issue123!.todos).toHaveLength(2);
 
-    const issue456 = issues.find((i) => i.issueID == 456);
+    const issue456 = issues.find((i) => i.issueID === 456);
     expect(issue456).toBeDefined();
     expect(issue456!.todos).toHaveLength(1);
   });
@@ -312,7 +317,7 @@ describe("getTODOIssues", () => {
     // git rev-parse --show-top-level
     exec.getExecOutput.mockResolvedValueOnce({
       exitCode: 0,
-      stdout: workspacePath + "\n",
+      stdout: `${workspacePath}\n`,
       stderr: "",
     });
 
@@ -342,7 +347,7 @@ describe("getTODOIssues", () => {
     // git rev-parse --show-top-level
     exec.getExecOutput.mockResolvedValueOnce({
       exitCode: 0,
-      stdout: repoRoot + "\n",
+      stdout: `${repoRoot}\n`,
       stderr: "",
     });
 
@@ -357,7 +362,7 @@ describe("getTODOIssues", () => {
       reopener.getTODOIssues(path.join(repoRoot, "path/to"), {}),
     ).resolves.toHaveLength(1);
 
-    expect(exec.getExecOutput).toBeCalledWith(
+    expect(exec.getExecOutput).toHaveBeenLastCalledWith(
       todosPath,
       ["--output=json", "path/to"],
       {
@@ -419,11 +424,7 @@ describe("reopenIssues", () => {
       };
     });
 
-    const wd = process.env.GITHUB_WORKSPACE as string;
-
-    await expect(
-      reopener.reopenIssues(wd, [], "", false),
-    ).resolves.toBeUndefined();
+    await expect(reopener.reopenIssues([], "", false)).resolves.toBeUndefined();
 
     expect(issues.get).not.toHaveBeenCalled();
     expect(issues.createComment).not.toHaveBeenCalled();
@@ -442,13 +443,11 @@ describe("reopenIssues", () => {
       };
     });
 
-    const wd = process.env.GITHUB_WORKSPACE as string;
-
     // NOTE: todoIssue.todos is empty.
     const todoIssue = new reopener.TODOIssue(123);
 
     await expect(
-      reopener.reopenIssues(wd, [todoIssue], "", false),
+      reopener.reopenIssues([todoIssue], "", false),
     ).resolves.toBeUndefined();
 
     expect(issues.get).not.toHaveBeenCalled();
@@ -470,13 +469,11 @@ describe("reopenIssues", () => {
       };
     });
 
-    const wd = process.env.GITHUB_WORKSPACE as string;
-
     const todoIssue = new reopener.TODOIssue(123);
     todoIssue.todos.push(new reopener.TODORef());
 
     await expect(
-      reopener.reopenIssues(wd, [todoIssue], "", false),
+      reopener.reopenIssues([todoIssue], "", false),
     ).resolves.toBeUndefined();
 
     expect(issues.get).toHaveBeenCalled();
@@ -502,12 +499,11 @@ describe("reopenIssues", () => {
       };
     });
 
-    const wd = process.env.GITHUB_WORKSPACE as string;
     const todoIssue = new reopener.TODOIssue(123);
     todoIssue.todos.push(new reopener.TODORef());
 
     await expect(
-      reopener.reopenIssues(wd, [todoIssue], "", false),
+      reopener.reopenIssues([todoIssue], "", false),
     ).resolves.toBeUndefined();
 
     expect(issues.get).toHaveBeenCalledTimes(1);
@@ -533,15 +529,13 @@ describe("reopenIssues", () => {
       };
     });
 
-    const wd = process.env.GITHUB_WORKSPACE as string;
-
     const todoIssue = new reopener.TODOIssue(123);
     // NOTE: multiple TODO references.
     todoIssue.todos.push(new reopener.TODORef());
     todoIssue.todos.push(new reopener.TODORef());
 
     await expect(
-      reopener.reopenIssues(wd, [todoIssue], "", false),
+      reopener.reopenIssues([todoIssue], "", false),
     ).resolves.toBeUndefined();
 
     expect(issues.get).toHaveBeenCalledTimes(1);
@@ -567,8 +561,6 @@ describe("reopenIssues", () => {
       };
     });
 
-    const wd = process.env.GITHUB_WORKSPACE as string;
-
     const todoIssue = new reopener.TODOIssue(123);
     // NOTE: multiple TODO references.
     todoIssue.todos.push(new reopener.TODORef());
@@ -576,7 +568,7 @@ describe("reopenIssues", () => {
 
     await expect(
       // NOTE: dry-run = true
-      reopener.reopenIssues(wd, [todoIssue], "", true),
+      reopener.reopenIssues([todoIssue], "", true),
     ).resolves.toBeUndefined();
 
     expect(issues.get).toHaveBeenCalledTimes(1);
@@ -602,8 +594,6 @@ describe("reopenIssues", () => {
       };
     });
 
-    const wd = process.env.GITHUB_WORKSPACE as string;
-
     const todoIssue1 = new reopener.TODOIssue(123);
     todoIssue1.todos.push(new reopener.TODORef());
     todoIssue1.todos.push(new reopener.TODORef());
@@ -612,7 +602,7 @@ describe("reopenIssues", () => {
     todoIssue2.todos.push(new reopener.TODORef());
 
     await expect(
-      reopener.reopenIssues(wd, [todoIssue1, todoIssue2], "", false),
+      reopener.reopenIssues([todoIssue1, todoIssue2], "", false),
     ).resolves.toBeUndefined();
 
     expect(issues.get).toHaveBeenCalledTimes(2);
@@ -624,7 +614,7 @@ describe("reopenIssues", () => {
 
 describe("labelMatch", () => {
   it("github url", async () => {
-    let num = reopener.matchLabel(
+    const num = reopener.matchLabel(
       "https://github.com/owner/repo/issues/123",
       {},
     );
@@ -632,7 +622,7 @@ describe("labelMatch", () => {
   });
 
   it("github url with spaces", async () => {
-    let num = reopener.matchLabel(
+    const num = reopener.matchLabel(
       " \thttps://github.com/owner/repo/issues/123  ",
       {},
     );
@@ -640,51 +630,51 @@ describe("labelMatch", () => {
   });
 
   it("github url no scheme", async () => {
-    let num = reopener.matchLabel("github.com/owner/repo/issues/123", {});
+    const num = reopener.matchLabel("github.com/owner/repo/issues/123", {});
     expect(num).toBe(123);
   });
 
   it("github url different repo", async () => {
-    let num = reopener.matchLabel("github.com/owner/other/issues/123", {});
+    const num = reopener.matchLabel("github.com/owner/other/issues/123", {});
     expect(num).toBe(-1);
   });
 
   it("github url different repo", async () => {
-    let num = reopener.matchLabel("github.com/owner/other/issues/123", {});
+    const num = reopener.matchLabel("github.com/owner/other/issues/123", {});
     expect(num).toBe(-1);
   });
 
   it("num only", async () => {
-    let num = reopener.matchLabel("123", {});
+    const num = reopener.matchLabel("123", {});
     expect(num).toBe(123);
   });
 
   it("num with #", async () => {
-    let num = reopener.matchLabel("#123", {});
+    const num = reopener.matchLabel("#123", {});
     expect(num).toBe(123);
   });
 
   it("no match", async () => {
-    let num = reopener.matchLabel("no match", {});
+    const num = reopener.matchLabel("no match", {});
     expect(num).toBe(-1);
   });
 
   it("vanity url", async () => {
-    let num = reopener.matchLabel("golang.org/issues/123", {
+    const num = reopener.matchLabel("golang.org/issues/123", {
       vanityURLs: ["^golang.org/issues/(?<id>[0-9]+)$"],
     });
     expect(num).toBe(123);
   });
 
   it("vanity url no match", async () => {
-    let num = reopener.matchLabel("golang.org/issues", {
+    const num = reopener.matchLabel("golang.org/issues", {
       vanityURLs: ["^golang.org/issues/(?<id>[0-9]+)$"],
     });
     expect(num).toBe(-1);
   });
 
   it("vanity url error", async () => {
-    let num = reopener.matchLabel("golang.org/issues/123", {
+    const num = reopener.matchLabel("golang.org/issues/123", {
       vanityURLs: ["^golang.org/issues/(?<id>[0-9]+$"],
     });
     expect(num).toBe(-1);

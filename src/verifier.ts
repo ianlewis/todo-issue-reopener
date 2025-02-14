@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as crypto from "crypto";
-import * as fs from "fs/promises";
+import crypto from "crypto";
+import fs from "fs/promises";
 
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";

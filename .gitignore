@@ -1,8 +1,9 @@
 # For markdownlint
 .git
 
-# Dependency directory
-node_modules
+# Dependency directories (remove the comment below to include it)
+node_modules/
+.venv/
 
 # Coverage files
 coverage

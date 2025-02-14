@@ -12,17 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as fs from "fs";
-import * as os from "os";
-import * as path from "path";
+import { jest } from "@jest/globals";
+
+import fs from "fs";
+import os from "os";
+import path from "path";
 
 import YAML from "yaml";
 
-import * as config from "../src/config";
+import * as core from "../__fixtures__/core.js";
+
+// Mocks should be declared before the module being tested is imported.
+jest.unstable_mockModule("@actions/core", () => core);
+
+const config = await import("../src/config.js");
 
 describe("readConfig", () => {
   it("handles non-existant config", async () => {
-    let c = await config.readConfig("not-exists.yml");
+    const c = await config.readConfig("not-exists.yml");
     expect(c).toEqual({});
   });
 
@@ -31,7 +38,7 @@ describe("readConfig", () => {
     const configPath = path.join(tmpDir, "empty.yml");
     fs.writeFileSync(configPath, "");
 
-    let c = await config.readConfig(configPath);
+    const c = await config.readConfig(configPath);
 
     expect(c).toEqual({});
   });
@@ -44,7 +51,7 @@ describe("readConfig", () => {
       'vanityURLs:\n  - "(https?://)?golang.org/issues/(?<id>[0-9]+)"',
     );
 
-    let c = await config.readConfig(configPath);
+    const c = await config.readConfig(configPath);
 
     expect(c).toEqual({
       vanityURLs: ["(https?://)?golang.org/issues/(?<id>[0-9]+)"],

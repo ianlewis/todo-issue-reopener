@@ -14,9 +14,12 @@
 
 import * as core from "@actions/core";
 
-import * as reopener from "./reopener";
-import * as config from "./config";
+import * as reopener from "./reopener.js";
+import * as config from "./config.js";
 
+/**
+ * runAction is an async function that runs the full GitHub action.
+ */
 export async function runAction(): Promise<void> {
   const wd = core.getInput("path", { required: true });
   const token = core.getInput("token", { required: true });
@@ -27,7 +30,7 @@ export async function runAction(): Promise<void> {
 
   try {
     const issues = await reopener.getTODOIssues(wd, conf);
-    await reopener.reopenIssues(wd, issues, token, dryRun);
+    await reopener.reopenIssues(issues, token, dryRun);
   } catch (err) {
     const message = err instanceof Error ? err.message : `${err}`;
     core.setFailed(message);
