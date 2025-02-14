@@ -32,6 +32,3 @@ export async function runAction() {
         core.setFailed(message);
     }
 }
-export default {
-    runAction,
-};

@@ -18,11 +18,8 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 
-// eslint-disable-next-line import/no-namespace
 import * as core from "../__fixtures__/core.js";
-// eslint-disable-next-line import/no-namespace
 import * as exec from "../__fixtures__/exec.js";
-// eslint-disable-next-line import/no-namespace
 import * as tc from "../__fixtures__/tool-cache.js";
 
 jest.unstable_mockModule("@actions/core", () => core);

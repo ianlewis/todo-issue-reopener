@@ -18,15 +18,10 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 
-// eslint-disable-next-line import/no-namespace
 import * as core from "../__fixtures__/core.js";
-// eslint-disable-next-line import/no-namespace
 import * as exec from "../__fixtures__/exec.js";
-// eslint-disable-next-line import/no-namespace
 import * as github from "../__fixtures__/github.js";
-// eslint-disable-next-line import/no-namespace
 import * as tc from "../__fixtures__/tool-cache.js";
-// eslint-disable-next-line import/no-namespace
 import * as verifier from "../__fixtures__/verifier.js";
 
 jest.unstable_mockModule("@actions/core", () => core);
@@ -78,7 +73,7 @@ describe("getTODOIssues", () => {
     // git rev-parse --show-top-level
     exec.getExecOutput.mockResolvedValueOnce({
       exitCode: 0,
-      stdout: workspacePath + "\n",
+      stdout: `${workspacePath}\n`,
       stderr: "",
     });
 
@@ -106,7 +101,7 @@ describe("getTODOIssues", () => {
     // git rev-parse --show-top-level
     exec.getExecOutput.mockResolvedValueOnce({
       exitCode: 0,
-      stdout: workspacePath + "\n",
+      stdout: `${workspacePath}\n`,
       stderr: "",
     });
 
@@ -134,7 +129,7 @@ describe("getTODOIssues", () => {
     // git rev-parse --show-top-level
     exec.getExecOutput.mockResolvedValueOnce({
       exitCode: 0,
-      stdout: workspacePath + "\n",
+      stdout: `${workspacePath}\n`,
       stderr: "",
     });
 
@@ -162,7 +157,7 @@ describe("getTODOIssues", () => {
     // git rev-parse --show-top-level
     exec.getExecOutput.mockResolvedValueOnce({
       exitCode: 0,
-      stdout: workspacePath + "\n",
+      stdout: `${workspacePath}\n`,
       stderr: "",
     });
 
@@ -190,7 +185,7 @@ describe("getTODOIssues", () => {
     // git rev-parse --show-top-level
     exec.getExecOutput.mockResolvedValueOnce({
       exitCode: 0,
-      stdout: workspacePath + "\n",
+      stdout: `${workspacePath}\n`,
       stderr: "",
     });
 
@@ -201,9 +196,9 @@ describe("getTODOIssues", () => {
       stderr: "",
     });
 
-    let p = reopener.getTODOIssues(workspacePath, {});
+    const p = reopener.getTODOIssues(workspacePath, {});
     await expect(p).resolves.toHaveLength(1);
-    let issues = await p;
+    const issues = await p;
 
     expect(issues[0].todos).toHaveLength(1);
     expect(issues[0].issueID).toBe(123);
@@ -222,7 +217,7 @@ describe("getTODOIssues", () => {
     // git rev-parse --show-top-level
     exec.getExecOutput.mockResolvedValueOnce({
       exitCode: 0,
-      stdout: workspacePath + "\n",
+      stdout: `${workspacePath}\n`,
       stderr: "",
     });
 
@@ -233,9 +228,9 @@ describe("getTODOIssues", () => {
       stderr: "",
     });
 
-    let p = reopener.getTODOIssues(workspacePath, {});
+    const p = reopener.getTODOIssues(workspacePath, {});
     await expect(p).resolves.toHaveLength(1);
-    let issues = await p;
+    const issues = await p;
 
     expect(issues[0].todos).toHaveLength(1);
     expect(issues[0].issueID).toBe(123);
@@ -254,7 +249,7 @@ describe("getTODOIssues", () => {
     // git rev-parse --show-top-level
     exec.getExecOutput.mockResolvedValueOnce({
       exitCode: 0,
-      stdout: workspacePath + "\n",
+      stdout: `${workspacePath}\n`,
       stderr: "",
     });
 
@@ -265,9 +260,9 @@ describe("getTODOIssues", () => {
       stderr: "",
     });
 
-    let p = reopener.getTODOIssues(workspacePath, {});
+    const p = reopener.getTODOIssues(workspacePath, {});
     await expect(p).resolves.toHaveLength(1);
-    let issues = await p;
+    const issues = await p;
 
     expect(issues[0].todos).toHaveLength(1);
     expect(issues[0].issueID).toBe(123);
@@ -286,7 +281,7 @@ describe("getTODOIssues", () => {
     // git rev-parse --show-top-level
     exec.getExecOutput.mockResolvedValueOnce({
       exitCode: 0,
-      stdout: workspacePath + "\n",
+      stdout: `${workspacePath}\n`,
       stderr: "",
     });
 
@@ -297,15 +292,15 @@ describe("getTODOIssues", () => {
       stderr: "",
     });
 
-    let p = reopener.getTODOIssues(workspacePath, {});
+    const p = reopener.getTODOIssues(workspacePath, {});
     await expect(p).resolves.toHaveLength(2);
-    let issues = await p;
+    const issues = await p;
 
-    const issue123 = issues.find((i) => i.issueID == 123);
+    const issue123 = issues.find((i) => i.issueID === 123);
     expect(issue123).toBeDefined();
     expect(issue123!.todos).toHaveLength(2);
 
-    const issue456 = issues.find((i) => i.issueID == 456);
+    const issue456 = issues.find((i) => i.issueID === 456);
     expect(issue456).toBeDefined();
     expect(issue456!.todos).toHaveLength(1);
   });
@@ -322,7 +317,7 @@ describe("getTODOIssues", () => {
     // git rev-parse --show-top-level
     exec.getExecOutput.mockResolvedValueOnce({
       exitCode: 0,
-      stdout: workspacePath + "\n",
+      stdout: `${workspacePath}\n`,
       stderr: "",
     });
 
@@ -352,7 +347,7 @@ describe("getTODOIssues", () => {
     // git rev-parse --show-top-level
     exec.getExecOutput.mockResolvedValueOnce({
       exitCode: 0,
-      stdout: repoRoot + "\n",
+      stdout: `${repoRoot}\n`,
       stderr: "",
     });
 
@@ -367,7 +362,7 @@ describe("getTODOIssues", () => {
       reopener.getTODOIssues(path.join(repoRoot, "path/to"), {}),
     ).resolves.toHaveLength(1);
 
-    expect(exec.getExecOutput).toBeCalledWith(
+    expect(exec.getExecOutput).toHaveBeenLastCalledWith(
       todosPath,
       ["--output=json", "path/to"],
       {
@@ -634,7 +629,7 @@ describe("reopenIssues", () => {
 
 describe("labelMatch", () => {
   it("github url", async () => {
-    let num = reopener.matchLabel(
+    const num = reopener.matchLabel(
       "https://github.com/owner/repo/issues/123",
       {},
     );
@@ -642,7 +637,7 @@ describe("labelMatch", () => {
   });
 
   it("github url with spaces", async () => {
-    let num = reopener.matchLabel(
+    const num = reopener.matchLabel(
       " \thttps://github.com/owner/repo/issues/123  ",
       {},
     );
@@ -650,51 +645,51 @@ describe("labelMatch", () => {
   });
 
   it("github url no scheme", async () => {
-    let num = reopener.matchLabel("github.com/owner/repo/issues/123", {});
+    const num = reopener.matchLabel("github.com/owner/repo/issues/123", {});
     expect(num).toBe(123);
   });
 
   it("github url different repo", async () => {
-    let num = reopener.matchLabel("github.com/owner/other/issues/123", {});
+    const num = reopener.matchLabel("github.com/owner/other/issues/123", {});
     expect(num).toBe(-1);
   });
 
   it("github url different repo", async () => {
-    let num = reopener.matchLabel("github.com/owner/other/issues/123", {});
+    const num = reopener.matchLabel("github.com/owner/other/issues/123", {});
     expect(num).toBe(-1);
   });
 
   it("num only", async () => {
-    let num = reopener.matchLabel("123", {});
+    const num = reopener.matchLabel("123", {});
     expect(num).toBe(123);
   });
 
   it("num with #", async () => {
-    let num = reopener.matchLabel("#123", {});
+    const num = reopener.matchLabel("#123", {});
     expect(num).toBe(123);
   });
 
   it("no match", async () => {
-    let num = reopener.matchLabel("no match", {});
+    const num = reopener.matchLabel("no match", {});
     expect(num).toBe(-1);
   });
 
   it("vanity url", async () => {
-    let num = reopener.matchLabel("golang.org/issues/123", {
+    const num = reopener.matchLabel("golang.org/issues/123", {
       vanityURLs: ["^golang.org/issues/(?<id>[0-9]+)$"],
     });
     expect(num).toBe(123);
   });
 
   it("vanity url no match", async () => {
-    let num = reopener.matchLabel("golang.org/issues", {
+    const num = reopener.matchLabel("golang.org/issues", {
       vanityURLs: ["^golang.org/issues/(?<id>[0-9]+)$"],
     });
     expect(num).toBe(-1);
   });
 
   it("vanity url error", async () => {
-    let num = reopener.matchLabel("golang.org/issues/123", {
+    const num = reopener.matchLabel("golang.org/issues/123", {
       vanityURLs: ["^golang.org/issues/(?<id>[0-9]+$"],
     });
     expect(num).toBe(-1);

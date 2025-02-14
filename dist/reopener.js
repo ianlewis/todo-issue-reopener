@@ -213,10 +213,3 @@ export async function reopenIssues(w, issues, token, dryRun) {
         });
     }
 }
-export default {
-    ReopenError,
-    TODORef,
-    matchLabel,
-    getTODOIssues,
-    reopenIssues,
-};

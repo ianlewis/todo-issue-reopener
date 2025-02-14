@@ -20,7 +20,7 @@ import * as exec from "@actions/exec";
 import * as github from "@actions/github";
 
 import * as verifier from "./verifier.js";
-import * as config from "./config.js";
+import type * as config from "./config.js";
 import { env } from "process";
 
 const TODOS_VERSION = "v0.10.0";
@@ -283,12 +283,3 @@ export async function reopenIssues(
     });
   }
 }
-
-export default {
-  ReopenError,
-  TODORef,
-
-  matchLabel,
-  getTODOIssues,
-  reopenIssues,
-};

@@ -159,13 +159,3 @@ export async function downloadAndVerifySLSA(
 
   return artifactPath;
 }
-
-export default {
-  FileError,
-  DigestValidationError,
-  VerificationError,
-
-  validateFileDigest,
-  downloadSLSAVerifier,
-  downloadAndVerifySLSA,
-};

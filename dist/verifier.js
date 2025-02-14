@@ -106,11 +106,3 @@ export async function downloadAndVerifySLSA(url, provenanceURL, sourceURI, sourc
     }
     return artifactPath;
 }
-export default {
-    FileError,
-    DigestValidationError,
-    VerificationError,
-    validateFileDigest,
-    downloadSLSAVerifier,
-    downloadAndVerifySLSA,
-};

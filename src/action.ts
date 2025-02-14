@@ -36,7 +36,3 @@ export async function runAction(): Promise<void> {
     core.setFailed(message);
   }
 }
-
-export default {
-  runAction,
-};

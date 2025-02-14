@@ -48,11 +48,14 @@ export default [
       },
     },
     rules: {
-      "i18n-text/no-en": ["off"],
+      "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
       "github/array-foreach": "error",
       "github/async-preventdefault": "warn",
       "github/no-then": "error",
       "github/no-blur": "error",
+      "i18n-text/no-en": ["off"],
+      "import/no-namespace": "off",
+       "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
     },
   },
 ];

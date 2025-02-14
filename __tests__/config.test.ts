@@ -20,7 +20,6 @@ import path from "path";
 
 import YAML from "yaml";
 
-// eslint-disable-next-line import/no-namespace
 import * as core from "../__fixtures__/core.js";
 
 // Mocks should be declared before the module being tested is imported.
@@ -30,7 +29,7 @@ const config = await import("../src/config.js");
 
 describe("readConfig", () => {
   it("handles non-existant config", async () => {
-    let c = await config.readConfig("not-exists.yml");
+    const c = await config.readConfig("not-exists.yml");
     expect(c).toEqual({});
   });
 
@@ -39,7 +38,7 @@ describe("readConfig", () => {
     const configPath = path.join(tmpDir, "empty.yml");
     fs.writeFileSync(configPath, "");
 
-    let c = await config.readConfig(configPath);
+    const c = await config.readConfig(configPath);
 
     expect(c).toEqual({});
   });
@@ -52,7 +51,7 @@ describe("readConfig", () => {
       'vanityURLs:\n  - "(https?://)?golang.org/issues/(?<id>[0-9]+)"',
     );
 
-    let c = await config.readConfig(configPath);
+    const c = await config.readConfig(configPath);
 
     expect(c).toEqual({
       vanityURLs: ["(https?://)?golang.org/issues/(?<id>[0-9]+)"],

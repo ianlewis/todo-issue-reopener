@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import reopener from "../src/reopener.js";
+import * as reopener from "../src/reopener.js";
 import type * as reopener_types from "../src/reopener.js";
 import { jest } from "@jest/globals";
 

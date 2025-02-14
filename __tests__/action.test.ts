@@ -14,9 +14,8 @@
 
 import { jest } from "@jest/globals";
 
-import reopener from "../__fixtures__/reopener.js";
-// eslint-disable-next-line import/no-namespace
 import * as core from "../__fixtures__/core.js";
+import * as reopener from "../__fixtures__/reopener.js";
 
 // Mocks should be declared before the module being tested is imported.
 jest.unstable_mockModule("@actions/core", () => core);
@@ -46,7 +45,7 @@ describe("runAction", () => {
     const dryRun = false;
 
     core.getInput.mockImplementation(
-      (name: string, options?: core.InputOptions): string => {
+      (name: string, _options?: core.InputOptions): string => {
         switch (name) {
           case "path":
             return workspacePath;
@@ -88,7 +87,7 @@ describe("runAction", () => {
     const dryRun = false;
 
     core.getInput.mockImplementation(
-      (name: string, options?: core.InputOptions): string => {
+      (name: string, _options?: core.InputOptions): string => {
         switch (name) {
           case "path":
             return workspacePath;
@@ -126,7 +125,7 @@ describe("runAction", () => {
     const dryRun = false;
 
     core.getInput.mockImplementation(
-      (name: string, options?: core.InputOptions): string => {
+      (name: string, _options?: core.InputOptions): string => {
         switch (name) {
           case "path":
             return workspacePath;

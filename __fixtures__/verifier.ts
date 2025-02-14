@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import verifier from "../src/verifier.js";
+import * as verifier from "../src/verifier.js";
 import type * as verifier_types from "../src/verifier.js";
 import { jest } from "@jest/globals";
 

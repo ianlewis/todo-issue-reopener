@@ -1,4 +1,4 @@
-import * as config from "./config.js";
+import type * as config from "./config.js";
 /**
  * ReopenError represents an error that occurred when reopening an issue.
  */
@@ -48,11 +48,3 @@ export declare function getTODOIssues(wd: string, conf: config.Config): Promise<
  * @param {boolean} dryRun true if running in dry-run mode.
  */
 export declare function reopenIssues(w: string, issues: TODOIssue[], token: string, dryRun: boolean): Promise<void>;
-declare const _default: {
-    ReopenError: typeof ReopenError;
-    TODORef: typeof TODORef;
-    matchLabel: typeof matchLabel;
-    getTODOIssues: typeof getTODOIssues;
-    reopenIssues: typeof reopenIssues;
-};
-export default _default;
