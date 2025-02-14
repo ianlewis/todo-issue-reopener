@@ -29,6 +29,9 @@ const SLSA_VERIFIER_VERSION = "v2.6.0";
 const SLSA_VERIFIER_SHA256SUM =
   "1c9c0d6a272063f3def6d233fa3372adbaff1f5a3480611a07c744e73246b62d";
 
+/**
+ * ReopenError represents an error that occurred when reopening an issue.
+ */ 
 export class ReopenError extends Error {
   constructor(message: string) {
     super(message);
@@ -38,7 +41,9 @@ export class ReopenError extends Error {
   }
 }
 
-// TODORef is a reference to a TODO comment.
+/**
+ * TODORef represents a reference to a TODO comment.
+ */
 export class TODORef {
   path = "";
   type = "";
@@ -49,7 +54,9 @@ export class TODORef {
   comment_line = 0;
 }
 
-// TODOIssue is a GitHub issue referenced by one or more TODOs.
+/**
+ * TODOIssue represents a GitHub issue referenced by one or more TODOs.
+ */
 export class TODOIssue {
   issueID: number;
   todos: TODORef[] = [];
@@ -63,8 +70,12 @@ const labelMatch = new RegExp(
   "^\\s*((https?://)?github.com/(.+)/(.+)/issues/|#?)([0-9]+)\\s*$",
 );
 
-// matchLabel matches the label and returns the GitHub issue number or -1 if
-// there is no match.
+/**
+ * matchLabel matches the label and returns the GitHub issue number or -1 if
+ * there is no match.
+ * @param {string} label The label to match against.
+ * @param {config.Config} conf The action configuration.
+ */
 export function matchLabel(label: string, conf: config.Config): number {
   const repo = github.context.repo;
   const match = label.match(labelMatch);
@@ -103,7 +114,13 @@ export function matchLabel(label: string, conf: config.Config): number {
   return -1;
 }
 
-// reopenIssues downloads the todos CLI, runs it, and returns issues linked to TODOs.
+/**
+ * getTODOIssues is an async function that downloads the todos CLI, runs it,
+ * and returns issues linked to TODOs.
+ * @param {string} wd The working directory to run todos in.
+ * @param {config.Config} conf The action configuration.
+ * @return {Promise<TODOIssue[]>} The issues and linked TODOs.
+ */
 export async function getTODOIssues(
   wd: string,
   conf: config.Config,
@@ -177,9 +194,15 @@ export async function getTODOIssues(
   return Array.from(issueMap.values());
 }
 
-// reopenIssues reopens issues linked to TODOs.
+/**
+ * reopenIssues is an async function that reopens issues linked to TODOs.
+ * @param {string} wd The working directory.
+ * @param {TODOIssue[]} issues The issues and associate TODOs.
+ * @param {string} token The GITHUB_TOKEN to authenticate with.
+ * @param {boolean} dryRun true if running in dry-run mode.
+ */
 export async function reopenIssues(
-  wd: string,
+  w: string,
   issues: TODOIssue[],
   token: string,
   dryRun: boolean,

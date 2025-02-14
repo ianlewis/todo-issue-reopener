@@ -12,25 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* TODO: reinstate tests
+import { jest } from "@jest/globals";
 
 import fs from "fs";
 import os from "os";
 import path from "path";
 
-// NOTE: must use require for mock to work.
-// const exec = require("@actions/exec");
-// const tc = require("@actions/tool-cache");
-// import exec from "@actions/exec";
-// import tc from "@actions/tool-cache";
+// eslint-disable-next-line import/no-namespace
+import * as core from "../__fixtures__/core.js";
+// eslint-disable-next-line import/no-namespace
+import * as exec from "../__fixtures__/exec.js";
+// eslint-disable-next-line import/no-namespace
+import * as tc from "../__fixtures__/tool-cache.js";
 
-import verifier from "../src/verifier";
+jest.unstable_mockModule("@actions/core", () => core);
+jest.unstable_mockModule("@actions/exec", () => exec);
+jest.unstable_mockModule("@actions/tool-cache", () => tc);
 
-jest.mock("@actions/exec");
-jest.mock("@actions/tool-cache");
-
-const exec = await import("@actions/exec");
-const tc = await import("@actions/tool-cache");
+const verifier = await import("../src/verifier.js");
 
 describe("validateFileDigest", () => {
   it("validates a file digest", async () => {
@@ -126,7 +125,7 @@ describe("downloadSLSAVerifier", () => {
   });
 
   it("fails with http error", async () => {
-    tc.downloadTool.mockRejectedValueOnce(new tc.HTTPError("foo"));
+    tc.downloadTool.mockRejectedValueOnce(new tc.HTTPError(403));
 
     await expect(
       verifier.downloadSLSAVerifier(
@@ -314,5 +313,3 @@ describe("downloadAndVerifySLSA", () => {
     ).rejects.toThrow(verifier.DigestValidationError);
   });
 });
-
-*/

@@ -12,44 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* TODO: reinstate tests
+import { jest } from "@jest/globals";
 
 import fs from "fs";
 import os from "os";
 import path from "path";
 
-// NOTE: must use require for mock to work.
-// const exec = require("@actions/exec");
-// const github = require("@actions/github");
+// eslint-disable-next-line import/no-namespace
+import * as core from "../__fixtures__/core.js";
+// eslint-disable-next-line import/no-namespace
+import * as exec from "../__fixtures__/exec.js";
+// eslint-disable-next-line import/no-namespace
+import * as github from "../__fixtures__/github.js";
+// eslint-disable-next-line import/no-namespace
+import * as tc from "../__fixtures__/tool-cache.js";
+// eslint-disable-next-line import/no-namespace
+import * as verifier from "../__fixtures__/verifier.js";
 
-// import exec from "@actions/exec";
-// import github from "@actions/github";
+jest.unstable_mockModule("@actions/core", () => core);
+jest.unstable_mockModule("@actions/exec", () => exec);
+jest.unstable_mockModule("@actions/github", () => github);
+jest.unstable_mockModule("@actions/tool-cache", () => tc);
+jest.unstable_mockModule("../src/verifier.js", () => verifier);
 
-// import verifier from "../src/verifier";
-
-import reopener from "../src/reopener.mjs";
-
-jest.unstable_mockModule("@actions/exec", () => ({
-  getExecOutput: jest.fn(),
-}));
-jest.unstable_mockModule("@actions/github", () => ({
-  getOctokit: jest.fn(),
-  context: {
-    repo: {
-      owner: "",
-      repo: "",
-    },
-    sha: "",
-  },
-}));
-jest.unstable_mockModule("../src/verifier.mjs", () => ({
-  downloadAndVerifySLSA: jest.fn(),
-}));
-
-const {exec} = await import("@actions/exec");
-const {github} = await import("@actions/github");
-
-const {verifier} = await import("../src/verifier");
+const reopener = await import("../src/reopener.js");
 
 describe("TODORef", () => {
   it("constructs", async () => {
@@ -714,5 +700,3 @@ describe("labelMatch", () => {
     expect(num).toBe(-1);
   });
 });
-
-*/

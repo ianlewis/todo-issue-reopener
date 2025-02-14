@@ -14,6 +14,9 @@
 import * as core from "@actions/core";
 import * as reopener from "./reopener.js";
 import * as config from "./config.js";
+/**
+ * runAction is an async function that runs the full GitHub action.
+ */
 export async function runAction() {
     const wd = core.getInput("path", { required: true });
     const token = core.getInput("token", { required: true });

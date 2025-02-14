@@ -41,7 +41,8 @@ export async function validateFileDigest(filePath, expectedDigest) {
         // Verify that the file exists.
         await fs.access(filePath);
         const untrustedContents = await fs.readFile(filePath);
-        computedDigest = crypto.createHash("sha256")
+        computedDigest = crypto
+            .createHash("sha256")
             .update(untrustedContents)
             .digest("hex");
     }

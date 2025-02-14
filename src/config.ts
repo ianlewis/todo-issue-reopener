@@ -12,22 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { readFile } from "fs/promises";
+import fs from "fs/promises";
 
-import { debug } from "@actions/core";
+import * as core from "@actions/core";
 
 import YAML from "yaml";
 
+/**
+ * Config represents the parsed config file.
+ */
 export interface Config {
+  /**
+   * vanityURLs is a list of regex strings to match against vanity issue URLs.
+   */ 
   vanityURLs?: string[];
 }
 
+/**
+ * readConfig is an async function that reads the config.yml file at the given
+ * path and return the parsed Config object.
+ * @param {string} configPath The path to the configuration file.
+ * @returns {Promise<Config>} The parsed config object.
+ */
 export async function readConfig(configPath: string): Promise<Config> {
   let contents: string;
   try {
-    contents = await readFile(configPath, { encoding: "utf8" });
+    contents = await fs.readFile(configPath, { encoding: "utf8" });
   } catch (err) {
-    debug(`error reading "${configPath}": ${err}`);
+    core.debug(`error reading "${configPath}": ${err}`);
     return {};
   }
 
