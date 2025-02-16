@@ -47,11 +47,13 @@ jobs:
   issue-reopener:
     runs-on: ubuntu-latest
     permissions:
+      # NOTE: contents: read is necessary for private repositories.
+      contents: read
       issues: write
     steps:
       - uses: actions/checkout@v3
       - name: Issue Reopener
-        uses: ianlewis/todo-issue-reopener@v0.1.0
+        uses: ianlewis/todo-issue-reopener@v1.4.0
 ```
 
 ## Inputs
