@@ -33921,10 +33921,10 @@ async function downloadAndVerifySLSA(url, provenanceURL, sourceURI, sourceTag, s
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-const TODOS_VERSION = "v0.10.0";
-const SLSA_VERIFIER_VERSION = "v2.6.0";
+const TODOS_VERSION = "v0.11.0";
+const SLSA_VERIFIER_VERSION = "v2.7.0";
 // See: https://github.com/slsa-framework/slsa-verifier/blob/main/SHA256SUM.md
-const SLSA_VERIFIER_SHA256SUM = "1c9c0d6a272063f3def6d233fa3372adbaff1f5a3480611a07c744e73246b62d";
+const SLSA_VERIFIER_SHA256SUM = "499befb675efcca9001afe6e5156891b91e71f9c07ab120a8943979f85cc82e6";
 /**
  * ReopenError represents an error that occurred when reopening an issue.
  */
