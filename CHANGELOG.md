@@ -5,9 +5,12 @@ All notable changes will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [1.5.0] - 2025-02-17
 
-- Updated the version of `todos` used to v0.11.0.
+- Updated the version of `todos` used to v0.11.0
+  ([#1474](https://github.com/ianlewis/todo-issue-reopener/issues/1474)).
+- Fixed edge cases in `vanityURLs` feature
+  ([#1475](https://github.com/ianlewis/todo-issue-reopener/issues/1475)).
 
 ## [1.4.0] - 2024-10-31
 
@@ -64,3 +67,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.2.1]: https://github.com/ianlewis/todo-issue-reopener/releases/tag/v1.2.1
 [1.3.0]: https://github.com/ianlewis/todo-issue-reopener/releases/tag/v1.3.0
 [1.4.0]: https://github.com/ianlewis/todo-issue-reopener/releases/tag/v1.4.0
+[1.5.0]: https://github.com/ianlewis/todo-issue-reopener/releases/tag/v1.5.0
