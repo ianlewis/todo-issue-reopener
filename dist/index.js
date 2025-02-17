@@ -33947,7 +33947,7 @@ class TODOIssue {
 }
 const labelMatch = new RegExp("^\\s*((https?://)?github.com/(.+)/(.+)/issues/|#?)([0-9]+)\\s*$");
 /**
- * matchLabel matches the label and returns the GitHub issue number or -1 if
+ * matchLabel matches the label and returns the GitHub issue number or NaN if
  * there is no match.
  * @param {string} label The label to match against.
  * @param {config.Config} conf The action configuration.
@@ -33959,7 +33959,7 @@ function matchLabel(label, conf) {
         // NOTE: Skip the issue if it links to another repository.
         if ((match[3] || match[4]) &&
             (match[3] !== repo.owner || match[4] !== repo.repo)) {
-            return -1;
+            return NaN;
         }
         return Number(match[5]);
     }
@@ -33971,9 +33971,10 @@ function matchLabel(label, conf) {
                 // Match the url and get the 'id' named capture group.
                 const r = new RegExp(urlMatch);
                 const m = r.exec(label);
-                if (m && m.groups) {
-                    return Number(m.groups.id);
+                if (!m || !m.groups || !m.groups.id) {
+                    continue;
                 }
+                return Number(m.groups.id);
             }
             catch (e) {
                 const msg = String(e);
@@ -33981,7 +33982,7 @@ function matchLabel(label, conf) {
             }
         }
     }
-    return -1;
+    return NaN;
 }
 /**
  * getTODOIssues is an async function that downloads the todos CLI, runs it,
@@ -34024,7 +34025,7 @@ async function getTODOIssues(wd, conf) {
         }
         const ref = JSON.parse(line);
         const issueNum = matchLabel(ref.label, conf);
-        if (issueNum <= 0) {
+        if (Number.isNaN(issueNum) || issueNum <= 0) {
             continue;
         }
         let issue = issueMap.get(issueNum);

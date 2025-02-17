@@ -636,12 +636,12 @@ describe("labelMatch", () => {
 
   it("github url different repo", async () => {
     const num = reopener.matchLabel("github.com/owner/other/issues/123", {});
-    expect(num).toBe(-1);
+    expect(num).toBe(NaN);
   });
 
   it("github url different repo", async () => {
     const num = reopener.matchLabel("github.com/owner/other/issues/123", {});
-    expect(num).toBe(-1);
+    expect(num).toBe(NaN);
   });
 
   it("num only", async () => {
@@ -656,7 +656,7 @@ describe("labelMatch", () => {
 
   it("no match", async () => {
     const num = reopener.matchLabel("no match", {});
-    expect(num).toBe(-1);
+    expect(num).toBe(NaN);
   });
 
   it("vanity url", async () => {
@@ -670,13 +670,46 @@ describe("labelMatch", () => {
     const num = reopener.matchLabel("golang.org/issues", {
       vanityURLs: ["^golang.org/issues/(?<id>[0-9]+)$"],
     });
-    expect(num).toBe(-1);
+    expect(num).toBe(NaN);
   });
 
-  it("vanity url error", async () => {
+  it("vanity no id", async () => {
     const num = reopener.matchLabel("golang.org/issues/123", {
-      vanityURLs: ["^golang.org/issues/(?<id>[0-9]+$"],
+      vanityURLs: ["^golang.org/issues/$"],
     });
-    expect(num).toBe(-1);
+    expect(num).toBe(NaN);
+  });
+
+  it("vanity url empty issue num", async () => {
+    const num = reopener.matchLabel("golang.org/issues/", {
+      vanityURLs: ["^golang.org/issues/(?<id>.*$)"],
+    });
+    expect(num).toBe(NaN);
+  });
+
+  it("vanity url empty negative issue num", async () => {
+    const num = reopener.matchLabel("golang.org/issues/abc", {
+      vanityURLs: ["^golang.org/issues/(?<id>-[0-9]+)$"],
+    });
+    expect(num).toBe(NaN);
+  });
+
+  it("vanity url empty issue non-num", async () => {
+    const num = reopener.matchLabel("golang.org/issues/abc", {
+      vanityURLs: ["^golang.org/issues/(?<id>[a-z]*)$"],
+    });
+    expect(num).toBe(NaN);
+  });
+
+  it("vanity url invalid regex", async () => {
+    const num = reopener.matchLabel("golang.org/issues/abc", {
+      vanityURLs: ["^golang.org/issues/(?<id>[a-z]*$"],
+    });
+    expect(num).toBe(NaN);
+    expect(core.warning).toBeCalledWith(
+      expect.stringMatching(
+        `^error parsing vanity url regex: SyntaxError: Invalid regular expression:`,
+      ),
+    );
   });
 });
