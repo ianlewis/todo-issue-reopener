@@ -71,7 +71,7 @@ const labelMatch = new RegExp(
 );
 
 /**
- * matchLabel matches the label and returns the GitHub issue number or -1 if
+ * matchLabel matches the label and returns the GitHub issue number or NaN if
  * there is no match.
  * @param {string} label The label to match against.
  * @param {config.Config} conf The action configuration.
@@ -86,7 +86,7 @@ export function matchLabel(label: string, conf: config.Config): number {
       (match[3] || match[4]) &&
       (match[3] !== repo.owner || match[4] !== repo.repo)
     ) {
-      return -1;
+      return NaN;
     }
 
     return Number(match[5]);
@@ -101,9 +101,12 @@ export function matchLabel(label: string, conf: config.Config): number {
         // Match the url and get the 'id' named capture group.
         const r = new RegExp(urlMatch);
         const m = r.exec(label);
-        if (m && m.groups) {
-          return Number(m.groups.id);
+
+        if (!m || !m.groups || !m.groups.id) {
+          continue;
         }
+
+        return Number(m.groups.id);
       } catch (e) {
         const msg = String(e);
         core.warning(`error parsing vanity url regex: ${msg}`);
@@ -111,7 +114,7 @@ export function matchLabel(label: string, conf: config.Config): number {
     }
   }
 
-  return -1;
+  return NaN;
 }
 
 /**
@@ -179,7 +182,7 @@ export async function getTODOIssues(
     const ref: TODORef = JSON.parse(line);
 
     const issueNum = matchLabel(ref.label, conf);
-    if (issueNum <= 0) {
+    if (Number.isNaN(issueNum) || issueNum <= 0) {
       continue;
     }
 

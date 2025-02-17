@@ -26,7 +26,7 @@ export declare class TODOIssue {
     constructor(issueID: number);
 }
 /**
- * matchLabel matches the label and returns the GitHub issue number or -1 if
+ * matchLabel matches the label and returns the GitHub issue number or NaN if
  * there is no match.
  * @param {string} label The label to match against.
  * @param {config.Config} conf The action configuration.
