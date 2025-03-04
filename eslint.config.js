@@ -14,6 +14,7 @@
 
 import globals from "globals";
 import tsParser from "@typescript-eslint/parser";
+import stylisticTs from "@stylistic/eslint-plugin-ts";
 import github from "eslint-plugin-github";
 
 export default [
@@ -22,6 +23,9 @@ export default [
   {
     files: ["**/*.{js,mjs,cjs,jsx,mjsx,ts,tsx,mtsx}"],
     ignores: ["**/coverage", "**/dist", "**/linter", "**/node_modules"],
+    plugins: {
+      "@stylistic/ts": stylisticTs,
+    },
     settings: {
       "import/resolver": {
         typescript: {
@@ -48,10 +52,6 @@ export default [
       },
     },
     rules: {
-      "@typescript-eslint/no-unused-vars": [
-        "error",
-        { argsIgnorePattern: "^_" },
-      ],
       "github/array-foreach": "error",
       "github/async-preventdefault": "warn",
       "github/no-then": "error",
@@ -59,6 +59,11 @@ export default [
       "i18n-text/no-en": ["off"],
       "import/no-namespace": "off",
       "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+      "@stylistic/ts/indent": ["error", 2],
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_" },
+      ],
     },
   },
 ];
