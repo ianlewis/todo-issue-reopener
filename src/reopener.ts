@@ -23,7 +23,7 @@ import * as verifier from "./verifier.js";
 import type * as config from "./config.js";
 import { env } from "process";
 
-const TODOS_VERSION = "v0.11.0";
+const TODOS_VERSION = "v0.12.0";
 const SLSA_VERIFIER_VERSION = "v2.7.0";
 // See: https://github.com/slsa-framework/slsa-verifier/blob/main/SHA256SUM.md
 const SLSA_VERIFIER_SHA256SUM =
