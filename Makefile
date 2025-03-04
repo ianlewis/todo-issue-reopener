@@ -1,4 +1,3 @@
-# Copyright 2023 Google LLC
 # Copyright 2024 Ian Lewis
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -79,7 +78,7 @@ package: compile ## Builds the distribution package.
 license-headers: ## Update license headers.
 	@set -euo pipefail; \
 		files=$$( \
-			git ls-files \
+			git ls-files --deduplicate \
 				':(glob)*.ts' 'src/*.ts' '__tests__/*.ts' '__fixtures__/*.ts' \
 				':(glob)*.mts' 'src/*.mts' '__tests__/*.mts' '__fixtures__/*.mts' \
 				':(glob)*.js' 'src/*.js' '__tests__/*.js'  '__fixtures__/*.js' \
@@ -101,6 +100,9 @@ license-headers: ## Update license headers.
 			autogen -i --no-code --no-tlc -c "$${name}" -l apache Makefile; \
 		fi;
 
+## Formatting
+#####################################################################
+
 .PHONY: format
 format: md-format yaml-format js-format ts-format ## Format all files
 
@@ -108,9 +110,8 @@ format: md-format yaml-format js-format ts-format ## Format all files
 md-format: node_modules/.installed ## Format Markdown files.
 	@set -euo pipefail; \
 		files=$$( \
-			git ls-files \
-				'*.md' \
-				'*.markdown' \
+			git ls-files --deduplicate \
+				'*.md' '**/*.md' \
 		); \
 		npx prettier --write --no-error-on-unmatched-pattern $${files}
 
@@ -118,9 +119,9 @@ md-format: node_modules/.installed ## Format Markdown files.
 yaml-format: node_modules/.installed ## Format YAML files.
 	@set -euo pipefail; \
 		files=$$( \
-			git ls-files \
-				'*.yml' \
-				'*.yaml' \
+			git ls-files --deduplicate \
+				'*.yml' '**/*.yml' \
+				'*.yaml' '**/*.yaml' \
 		); \
 		npx prettier --write --no-error-on-unmatched-pattern $${files}
 
@@ -128,7 +129,7 @@ yaml-format: node_modules/.installed ## Format YAML files.
 js-format: node_modules/.installed ## Format YAML files.
 	@set -euo pipefail; \
 		files=$$( \
-			git ls-files \
+			git ls-files --deduplicate \
 				':(glob)*.js' 'src/*.js' '__tests__/*.js'  '__fixtures__/*.js' \
 				':(glob)*.mjs' 'src/*.mjs' '__tests__/*.mjs' '__fixtures__/*.mjs' \
 		); \
@@ -138,7 +139,7 @@ js-format: node_modules/.installed ## Format YAML files.
 ts-format: node_modules/.installed ## Format YAML files.
 	@set -euo pipefail; \
 		files=$$( \
-			git ls-files \
+			git ls-files --deduplicate \
 				':(glob)*.ts' 'src/*.ts' '__tests__/*.ts' '__fixtures__/*.ts' \
 				':(glob)*.mts' 'src/*.mts' '__tests__/*.mts' '__fixtures__/*.mts' \
 		); \
@@ -156,14 +157,14 @@ unit-test: compile ## Runs all unit tests.
 #####################################################################
 
 .PHONY: lint
-lint: yamllint actionlint markdownlint eslint ## Run all linters.
+lint: yamllint markdownlint actionlint zizmor eslint ## Run all linters.
 
 .PHONY: actionlint
 actionlint: ## Runs the actionlint linter.
 	@# NOTE: We need to ignore config files used in tests.
 	@set -euo pipefail;\
 		files=$$( \
-			git ls-files \
+			git ls-files --deduplicate \
 				'.github/workflows/*.yml' \
 				'.github/workflows/*.yaml' \
 		); \
@@ -173,13 +174,36 @@ actionlint: ## Runs the actionlint linter.
 			actionlint $${files}; \
 		fi
 
+.PHONY: zizmor
+zizmor: .venv/.installed ## Runs the zizmor linter.
+	@# NOTE: On GitHub actions this outputs SARIF format to zizmor.sarif.json
+	@#       rather than outputting errors to the terminal. This is so that
+	@#       security issues can be uploaded privately rather than being made
+	@#       public.
+	@set -euo pipefail;\
+		extraargs=""; \
+		files=$$( \
+			git ls-files --deduplicate \
+				'.github/workflows/*.yml' \
+				'.github/workflows/*.yaml' \
+		); \
+		if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
+			.venv/bin/zizmor --quiet --pedantic --format sarif $${files} > zizmor.sarif.json; \
+		else \
+			.venv/bin/zizmor --quiet --pedantic --format plain $${files}; \
+		fi
+
 .PHONY: markdownlint
 markdownlint: node_modules/.installed ## Runs the markdownlint linter.
+	@# NOTE: Issue and PR templates are handled specially so we can disable
+	@# MD041/first-line-heading/first-line-h1 without adding an ugly html comment
+	@# at the top of the file.
 	@set -euo pipefail;\
 		files=$$( \
-			git ls-files \
-				'*.md' \
-				'*.markdown' \
+			git ls-files --deduplicate \
+				'*.md' '**/*.md' \
+				':!:.github/pull_request_template.md' \
+				':!:.github/ISSUE_TEMPLATE/*.md' \
 		); \
 		if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
 			exit_code=0; \
@@ -190,10 +214,33 @@ markdownlint: node_modules/.installed ## Runs the markdownlint linter.
 				message=$$(echo "$$p" | jq -c -r '.ruleNames[0] + "/" + .ruleNames[1] + " " + .ruleDescription + " [Detail: \"" + .errorDetail + "\", Context: \"" + .errorContext + "\"]"'); \
 				exit_code=1; \
 				echo "::error file=$${file},line=$${line},endLine=$${endline}::$${message}"; \
-			done <<< "$$(npx markdownlint --dot --json $${files} 2>&1 | jq -c '.[]')"; \
-			exit "$${exit_code}"; \
+			done <<< "$$(npx markdownlint --config .markdownlint.yaml --dot --json $${files} 2>&1 | jq -c '.[]')"; \
+			if [ "$${exit_code}" != "0" ]; then \
+				exit "$${exit_code}"; \
+			fi; \
 		else \
-			npx markdownlint --dot $${files}; \
+			npx markdownlint --config .markdownlint.yaml --dot $${files}; \
+		fi; \
+		files=$$( \
+			git ls-files --deduplicate \
+				'.github/pull_request_template.md' \
+				'.github/ISSUE_TEMPLATE/*.md' \
+		); \
+		if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
+			exit_code=0; \
+			while IFS="" read -r p && [ -n "$$p" ]; do \
+				file=$$(echo "$$p" | jq -c -r '.fileName // empty'); \
+				line=$$(echo "$$p" | jq -c -r '.lineNumber // empty'); \
+				endline=$${line}; \
+				message=$$(echo "$$p" | jq -c -r '.ruleNames[0] + "/" + .ruleNames[1] + " " + .ruleDescription + " [Detail: \"" + .errorDetail + "\", Context: \"" + .errorContext + "\"]"'); \
+				exit_code=1; \
+				echo "::error file=$${file},line=$${line},endLine=$${endline}::$${message}"; \
+			done <<< "$$(npx markdownlint --config .github/template.markdownlint.yaml --dot --json $${files} 2>&1 | jq -c '.[]')"; \
+			if [ "$${exit_code}" != "0" ]; then \
+				exit "$${exit_code}"; \
+			fi; \
+		else \
+			npx markdownlint  --config .github/template.markdownlint.yaml --dot $${files}; \
 		fi
 
 .PHONY: yamllint
@@ -201,9 +248,9 @@ yamllint: .venv/.installed ## Runs the yamllint linter.
 	@set -euo pipefail;\
 		extraargs=""; \
 		files=$$( \
-			git ls-files \
-				'*.yml' \
-				'*.yaml' \
+			git ls-files --deduplicate \
+				'*.yml' '**/*.yml' \
+				'*.yaml' '**/*.yaml' \
 		); \
 		if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
 			extraargs="-f github"; \
@@ -214,7 +261,7 @@ yamllint: .venv/.installed ## Runs the yamllint linter.
 eslint: node_modules/.installed ## Runs eslint.
 	@set -euo pipefail; \
 		files=$$( \
-			git ls-files \
+			git ls-files --deduplicate \
 				'src/*.ts' \
 				'src/*.mts' \
 				'src/*.js' \
@@ -264,5 +311,6 @@ clean: ## Delete temporary files.
 	@rm -rf \
 		.venv \
 		node_modules \
+		*.sarif.json \
 		lib \
 		coverage
