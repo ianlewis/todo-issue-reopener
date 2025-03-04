@@ -5,6 +5,10 @@ All notable changes will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+- Updated the version of `todos` used to v0.12.0.
+
 ## [1.5.0] - 2025-02-17
 
 - Updated the version of `todos` used to v0.11.0
