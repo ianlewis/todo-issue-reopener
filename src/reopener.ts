@@ -14,14 +14,15 @@
 
 import fs from "fs/promises";
 import path from "path";
+import { env } from "process";
 
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as github from "@actions/github";
+import { retry } from "@octokit/plugin-retry";
 
 import * as verifier from "./verifier.js";
 import type * as config from "./config.js";
-import { env } from "process";
 
 const TODOS_VERSION = "v0.12.0";
 const SLSA_VERIFIER_VERSION = "v2.7.0";
@@ -208,7 +209,8 @@ export async function reopenIssues(
   token: string,
   dryRun: boolean,
 ): Promise<void> {
-  const octokit = github.getOctokit(token);
+  const octokit = github.getOctokit(token, undefined, retry);
+
   const repo = github.context.repo;
   const sha = github.context.sha;
 
