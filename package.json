@@ -28,6 +28,8 @@
     "@actions/exec": "^1.1.1",
     "@actions/github": "^6.0.0",
     "@actions/tool-cache": "^2.0.1",
+    "@octokit/core": "^5.2.1",
+    "@octokit/plugin-retry": "^6.1.0",
     "uuid": "^11.1.0",
     "yaml": "^2.6.0"
   },
