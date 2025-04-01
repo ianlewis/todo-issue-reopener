@@ -31,7 +31,7 @@
     "@octokit/core": "^5.2.1",
     "@octokit/plugin-retry": "^6.1.0",
     "uuid": "^11.1.0",
-    "yaml": "^2.6.0"
+    "yaml": "^2.7.1"
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.7",
