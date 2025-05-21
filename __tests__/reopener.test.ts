@@ -323,8 +323,8 @@ describe("getTODOIssues", () => {
 
     // todos
     exec.getExecOutput.mockResolvedValueOnce({
-      // NOTE: todos returns exit code
-      exitCode: 1,
+      // NOTE: todos returns an error exit code
+      exitCode: 2,
       stdout: "",
       stderr: "ERROR",
     });
