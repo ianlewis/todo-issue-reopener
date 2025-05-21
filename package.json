@@ -1,7 +1,7 @@
 {
   "name": "todo-issue-reopener",
   "description": "Reopen issues that are referenced by TODOs",
-  "version": "1.2.0",
+  "version": "1.7.0",
   "author": "Ian Lewis <ian@ianlewis.org>",
   "type": "module",
   "private": true,
