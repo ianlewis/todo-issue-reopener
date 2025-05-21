@@ -1,9 +1,11 @@
 # For markdownlint
-.git
+.git/
 
 # Dependency directories (remove the comment below to include it)
 node_modules/
+.bin/
 .venv/
+.aqua/
 
 # SARIF files
 *.sarif.json
@@ -12,7 +14,7 @@ node_modules/
 coverage
 
 # Generated intermediate JavaScript code
-lib
+dist/
 
 # Rest pulled from https://github.com/github/gitignore/blob/master/Node.gitignore
 # Logs
@@ -109,4 +111,3 @@ Thumbs.db
 
 # Ignore built ts files
 __tests__/runner/*
-lib/**/*
