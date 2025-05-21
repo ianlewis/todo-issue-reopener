@@ -24,7 +24,9 @@ import { retry } from "@octokit/plugin-retry";
 import * as verifier from "./verifier.js";
 import type * as config from "./config.js";
 
-const TODOS_VERSION = "v0.12.0";
+// renovate: datasource=github-releases depName=ianlewis/todos versioning=loose
+const TODOS_VERSION = "v0.13.0";
+// renovate: datasource=github-releases depName=slsa-framework/slsa-verifier versioning=loose
 const SLSA_VERIFIER_VERSION = "v2.7.0";
 // See: https://github.com/slsa-framework/slsa-verifier/blob/main/SHA256SUM.md
 const SLSA_VERIFIER_SHA256SUM =
@@ -169,7 +171,8 @@ export async function getTODOIssues(
     },
   );
   core.debug(`Ran todos (${todosPath})`);
-  if (exitCode !== 0) {
+  // NOTE: The exit code is 1 if there are TODOs and 0 if there are none.
+  if (exitCode > 1) {
     throw new ReopenError(`todos exited ${exitCode}: ${stderr}`);
   }
 
@@ -270,11 +273,7 @@ export async function reopenIssues(
     let body = `This issue was reopened by the todo-issue-reopener action in the ["${env.GITHUB_WORKFLOW}"](https://github.com/${repo.owner}/${repo.repo}/blob/${sha}/${workflowPath}) GitHub Actions workflow because there are TODOs referencing this issue:\n`;
     for (const [i, todo] of issueRef.todos.entries()) {
       // NOTE: Get the path from the root of the repository.
-      body += `${i + 1}. [${todo.path}:${todo.line}](https://github.com/${
-        repo.owner
-      }/${repo.repo}/blob/${sha}/${todo.path}#L${todo.line}): ${
-        todo.message
-      }\n`;
+      body += `${i + 1}. [${todo.path}:${todo.line}](https://github.com/${repo.owner}/${repo.repo}/blob/${sha}/${todo.path}#L${todo.line}): ${todo.message}\n`;
     }
 
     // Post the comment.
