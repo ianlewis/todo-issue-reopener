@@ -67,7 +67,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added in 0.1.0
 
 - Moved from `ianlewis/todos/actions/issue-reopener` to a new repository. See
-  [ianlewis/todos/CHANGELOG.md](https://github.com/ianlewis/todos/blob/main/CHANGELOG.md)
+  [`ianlewis/todos/CHANGELOG.md`](https://github.com/ianlewis/todos/blob/main/CHANGELOG.md)
   for changes prior to the move.
 
 [0.1.0]: https://github.com/ianlewis/todo-issue-reopener/releases/tag/v0.1.0
