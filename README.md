@@ -54,7 +54,7 @@ jobs:
         steps:
             - uses: actions/checkout@v3
             - name: Issue Reopener
-              uses: ianlewis/todo-issue-reopener@v1.4.0
+              uses: ianlewis/todo-issue-reopener@v1.7.0
 ```
 
 ## Inputs
