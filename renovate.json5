@@ -14,6 +14,10 @@
     // Add Aqua present to allow updating CLI tools.
     // https://aquaproj.github.io/docs/guides/renovate/
     "github>aquaproj/aqua-renovate-config#2.8.0",
+
+    // Update version numbers in Makefile.
+    // https://docs.renovatebot.com/presets-customManagers/#custommanagersmakefileversions
+    "customManagers:makefileVersions",
   ],
 
   // Security alerts/updates happen more frequently.
@@ -25,24 +29,6 @@
   // an existing issue which can be very old and is easily missed. Opening new
   // issues is more intuitive.
   configWarningReuseIssue: false,
-
-  // Update the Aqua version set in the Makefile.
-  customManagers: [
-    {
-      customType: "regex",
-      managerFilePatterns: ["/Makefile/"],
-      matchStrings: ["AQUA_VERSION \\??= *(?<currentValue>\\S+)"],
-      depNameTemplate: "aquaproj/aqua",
-      datasourceTemplate: "github-releases",
-    },
-    {
-      customType: "regex",
-      managerFilePatterns: ["/src\\/.+\\.ts$/"],
-      matchStrings: [
-        "// renovate: datasource=(?<datasource>[a-zA-Z0-9-._]+?) depName=(?<depName>[^\\s]+?)(?: (lookupName|packageName)=(?<packageName>[^\\s]+?))?(?: versioning=(?<versioning>[^\\s]+?))?(?: extractVersion=(?<extractVersion>[^\\s]+?))?(?: registryUrl=(?<registryUrl>[^\\s]+?))?\\sconst\\s+[A-Za-z0-9_]+?_VERSION\\s*=\\s*[\"'](?<currentValue>.+?)[\"'];\\s",
-      ],
-    },
-  ],
 
   // Group various ecosystem updates. Security updates are always separate.
   packageRules: [
