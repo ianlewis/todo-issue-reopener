@@ -25,12 +25,13 @@ OUTPUT_FORMAT ?= $(shell if [ "${GITHUB_ACTIONS}" == "true" ]; then echo "github
 REPO_ROOT = $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 REPO_NAME = $(shell basename "$(REPO_ROOT)")
 
-AQUA_VERSION ?= 2.51.2
+# renovate: datasource=github-releases depName=aquaproj/aqua versioning=loose
+AQUA_VERSION ?= v2.51.2
 AQUA_REPO ?= github.com/aquaproj/aqua
 AQUA_CHECKSUM.Linux.x86_64 = 17db2da427bde293b1942e3220675ef796a67f1207daf89e6e80fea8d2bb8c22
 AQUA_CHECKSUM.Linux.aarch64 = b3f0d573e762ce9d104c671b8224506c4c4a32eedd1e6d7ae1e1e39983cdb6a8
 AQUA_CHECKSUM ?= $(AQUA_CHECKSUM.$(uname_s).$(uname_m))
-AQUA_URL = https://$(AQUA_REPO)/releases/download/v$(AQUA_VERSION)/aqua_$(kernel)_$(arch).tar.gz
+AQUA_URL = https://$(AQUA_REPO)/releases/download/$(AQUA_VERSION)/aqua_$(kernel)_$(arch).tar.gz
 AQUA_ROOT_DIR = $(REPO_ROOT)/.aqua
 
 # The help command prints targets in groups. Help documentation in the Makefile
@@ -90,7 +91,7 @@ node_modules/.installed: package-lock.json
 .bin/aqua-$(AQUA_VERSION)/aqua:
 	@set -euo pipefail; \
 		mkdir -p .bin/aqua-$(AQUA_VERSION); \
-		tempfile=$$(mktemp --suffix=".aqua-v$(AQUA_VERSION).tar.gz"); \
+		tempfile=$$(mktemp --suffix=".aqua-$(AQUA_VERSION).tar.gz"); \
 		curl -sSLo "$${tempfile}" "$(AQUA_URL)"; \
 		echo "$(AQUA_CHECKSUM)  $${tempfile}" | sha256sum -c; \
 		tar -x -C .bin/aqua-$(AQUA_VERSION) -f "$${tempfile}"
@@ -112,6 +113,15 @@ package: compile ## Builds the distribution package.
 	@rm -rf dist
 	@npx rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript
 
+## Testing
+#####################################################################
+
+.PHONY: unit-test
+unit-test: compile ## Runs all unit tests.
+	# NOTE: Make sure the package builds.
+	@NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 \
+		./node_modules/.bin/jest
+
 ## Tools
 #####################################################################
 
@@ -120,11 +130,23 @@ license-headers: ## Update license headers.
 	@set -euo pipefail; \
 		files=$$( \
 			git ls-files --deduplicate \
-				':(glob)*.ts' 'src/*.ts' '__tests__/*.ts' '__fixtures__/*.ts' \
-				':(glob)*.mts' 'src/*.mts' '__tests__/*.mts' '__fixtures__/*.mts' \
-				':(glob)*.js' 'src/*.js' '__tests__/*.js'  '__fixtures__/*.js' \
-				':(glob)*.mjs' 'src/*.mjs' '__tests__/*.mjs' '__fixtures__/*.mjs' \
+				'*.c' \
+				'*.cpp' \
+				'*.go' \
+				'*.h' \
+				'*.hpp' \
+				'*.ts' \
+				'*.js' \
+				'*.lua' \
+				'*.py' \
+				'*.rb' \
+				'*.rs' \
+				'*.toml' \
+				'*.yaml' \
+				'*.yml' \
 				'Makefile' \
+				':!:dist/' \
+				| while IFS='' read -r f; do [ -f "$${f}" ] && echo "$${f}" || true; done \
 		); \
 		name=$$(git config user.name); \
 		if [ "$${name}" == "" ]; then \
@@ -159,9 +181,11 @@ json-format: node_modules/.installed ## Format JSON files.
 				'*.json5' \
 				| while IFS='' read -r f; do [ -f "$${f}" ] && echo "$${f}" || true; done \
 		); \
+		if [ "$${files}" == "" ]; then \
+			exit 0; \
+		fi; \
 		./node_modules/.bin/prettier \
 			--write \
-			--no-error-on-unmatched-pattern \
 			$${files}
 
 .PHONY: md-format
@@ -173,10 +197,12 @@ md-format: node_modules/.installed ## Format Markdown files.
 				'*.md' \
 				| while IFS='' read -r f; do [ -f "$${f}" ] && echo "$${f}" || true; done \
 		); \
+		if [ "$${files}" == "" ]; then \
+			exit 0; \
+		fi; \
 		# NOTE: prettier uses .editorconfig for tab-width. \
 		./node_modules/.bin/prettier \
 			--write \
-			--no-error-on-unmatched-pattern \
 			$${files}
 
 .PHONY: yaml-format
@@ -187,9 +213,11 @@ yaml-format: node_modules/.installed ## Format YAML files.
 				'*.yml' \
 				'*.yaml' \
 		); \
+		if [ "$${files}" == "" ]; then \
+			exit 0; \
+		fi; \
 		./node_modules/.bin/prettier \
 			--write \
-			--no-error-on-unmatched-pattern \
 			$${files}
 
 .PHONY: js-format
@@ -197,12 +225,18 @@ js-format: node_modules/.installed ## Format YAML files.
 	@set -euo pipefail; \
 		files=$$( \
 			git ls-files --deduplicate \
-				':(glob)*.js' 'src/*.js' '__tests__/*.js'  '__fixtures__/*.js' \
-				':(glob)*.mjs' 'src/*.mjs' '__tests__/*.mjs' '__fixtures__/*.mjs' \
+				'*.js' \
+				'*.cjs' \
+				'*.mjs' \
+				'*.jsx' \
+				'*.mjsx' \
+				':!:dist/' \
 		); \
+		if [ "$${files}" == "" ]; then \
+			exit 0; \
+		fi; \
 		./node_modules/.bin/prettier \
 			--write \
-			--no-error-on-unmatched-pattern \
 			$${files}
 
 .PHONY: ts-format
@@ -210,21 +244,19 @@ ts-format: node_modules/.installed ## Format YAML files.
 	@set -euo pipefail; \
 		files=$$( \
 			git ls-files --deduplicate \
-				':(glob)*.ts' 'src/*.ts' '__tests__/*.ts' '__fixtures__/*.ts' \
-				':(glob)*.mts' 'src/*.mts' '__tests__/*.mts' '__fixtures__/*.mts' \
-		); \
+				'*.ts' \
+				'*.cts' \
+				'*.mts' \
+				'*.tsx' \
+				'*.mtsx' \
+				':!:dist/' \
+		);  \
+		if [ "$${files}" == "" ]; then \
+			exit 0; \
+		fi; \
 		./node_modules/.bin/prettier \
 			--write \
-			--no-error-on-unmatched-pattern \
 			$${files}
-
-## Testing
-#####################################################################
-
-.PHONY: unit-test
-unit-test: compile ## Runs all unit tests.
-	# NOTE: Make sure the package builds.
-	@NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 npx jest
 
 ## Linting
 #####################################################################
@@ -242,6 +274,9 @@ actionlint: $(AQUA_ROOT_DIR)/.installed ## Runs the actionlint linter.
 				'.github/workflows/*.yaml' \
 				| while IFS='' read -r f; do [ -f "$${f}" ] && echo "$${f}" || true; done \
 		); \
+		if [ "$${files}" == "" ]; then \
+			exit 0; \
+		fi; \
 		PATH="$(REPO_ROOT)/.bin/aqua-$(AQUA_VERSION):$(AQUA_ROOT_DIR)/bin:$${PATH}"; \
 		AQUA_ROOT_DIR="$(AQUA_ROOT_DIR)"; \
 		if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
@@ -264,6 +299,9 @@ zizmor: .venv/.installed ## Runs the zizmor linter.
 				'.github/workflows/*.yaml' \
 				| while IFS='' read -r f; do [ -f "$${f}" ] && echo "$${f}" || true; done \
 		); \
+		if [ "$${files}" == "" ]; then \
+			exit 0; \
+		fi; \
 		if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
 			.venv/bin/zizmor \
 				--quiet \
@@ -290,6 +328,9 @@ markdownlint: node_modules/.installed $(AQUA_ROOT_DIR)/.installed ## Runs the ma
 				':!:.github/ISSUE_TEMPLATE/*.md' \
 				| while IFS='' read -r f; do [ -f "$${f}" ] && echo "$${f}" || true; done \
 		); \
+		if [ "$${files}" == "" ]; then \
+			exit 0; \
+		fi; \
 		PATH="$(REPO_ROOT)/.bin/aqua-$(AQUA_VERSION):$(AQUA_ROOT_DIR)/bin:$${PATH}"; \
 		AQUA_ROOT_DIR="$(AQUA_ROOT_DIR)"; \
 		if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
@@ -317,6 +358,9 @@ markdownlint: node_modules/.installed $(AQUA_ROOT_DIR)/.installed ## Runs the ma
 				'.github/ISSUE_TEMPLATE/*.md' \
 				| while IFS='' read -r f; do [ -f "$${f}" ] && echo "$${f}" || true; done \
 		); \
+		if [ "$${files}" == "" ]; then \
+			exit 0; \
+		fi; \
 		if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
 			exit_code=0; \
 			while IFS="" read -r p && [ -n "$$p" ]; do \
@@ -351,6 +395,9 @@ textlint: node_modules/.installed $(AQUA_ROOT_DIR)/.installed ## Runs the textli
 				':!:requirements.txt' \
 				| while IFS='' read -r f; do [ -f "$${f}" ] && echo "$${f}" || true; done \
 		); \
+		if [ "$${files}" == "" ]; then \
+			exit 0; \
+		fi; \
 		if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
 			exit_code=0; \
 			while IFS="" read -r p && [ -n "$$p" ]; do \
@@ -378,6 +425,9 @@ todos: $(AQUA_ROOT_DIR)/.installed ## Check for outstanding TODOs.
 			git ls-files --deduplicate \
 				| while IFS='' read -r f; do [ -f "$${f}" ] && echo "$${f}" || true; done \
 		); \
+		if [ "$${files}" == "" ]; then \
+			exit 0; \
+		fi; \
 		PATH="$(REPO_ROOT)/.bin/aqua-$(AQUA_VERSION):$(AQUA_ROOT_DIR)/bin:$${PATH}"; \
 		AQUA_ROOT_DIR="$(AQUA_ROOT_DIR)"; \
 		output="default"; \
@@ -405,6 +455,9 @@ yamllint: .venv/.installed ## Runs the yamllint linter.
 				'*.yaml' \
 				| while IFS='' read -r f; do [ -f "$${f}" ] && echo "$${f}" || true; done \
 		); \
+		if [ "$${files}" == "" ]; then \
+			exit 0; \
+		fi; \
 		format="standard"; \
 		if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
 			format="github"; \
@@ -420,19 +473,21 @@ eslint: node_modules/.installed ## Runs eslint.
 	@set -euo pipefail; \
 		files=$$( \
 			git ls-files --deduplicate \
-				'src/*.ts' \
-				'src/*.mts' \
-				'src/*.js' \
-				'src/*.mjs' \
-				'__tests__/*.ts' \
-				'__tests__/*.mts' \
-				'__tests__/*.js' \
-				'__tests__/*.mjs' \
-				'__fixtures__/*.ts' \
-				'__fixtures__/*.mts' \
-				'__fixtures__/*.js' \
-				'__fixtures__/*.mjs' \
+				'*.js' \
+				'*.cjs' \
+				'*.mjs' \
+				'*.jsx' \
+				'*.mjsx' \
+				'*.ts' \
+				'*.cts' \
+				'*.mts' \
+				'*.tsx' \
+				'*.mtsx' \
+				':!:dist/' \
 		); \
+		if [ "$${files}" == "" ]; then \
+			exit 0; \
+		fi; \
 		if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
 			set -euo pipefail; \
 			exit_code=0; \
@@ -455,10 +510,15 @@ eslint: node_modules/.installed ## Runs eslint.
 						;; \
 					esac; \
 				done <<<$$(echo "$${p}" | jq -c '.messages[]'); \
-			done <<<$$(npx eslint --max-warnings 0 -f json $${files} | jq -c '.[]'); \
+			done <<<$$(./node_modules/.bin/eslint \
+				--max-warnings 0 \
+				--format json \
+				$${files} | jq -c '.[]'); \
 			exit "$${exit_code}"; \
 		else \
-			npx eslint --max-warnings 0 $${files}; \
+			./node_modules/.bin/eslint \
+				--max-warnings 0 \
+				$${files}; \
 		fi
 
 ## Maintenance
@@ -471,6 +531,6 @@ clean: ## Delete temporary files.
 		$(AQUA_ROOT_DIR) \
 		.venv \
 		node_modules \
-		*.sarif.json\
+		*.sarif.json \
 		lib \
 		coverage

@@ -31,6 +31,7 @@ rules:
       - "CLI"
       - "CVSS"
       - "DCO"
+      - "ESM" # ECMAScript Modules
       - "PR"
       - "UI"
       - "YAML"

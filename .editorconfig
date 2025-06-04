@@ -26,3 +26,8 @@ indent_style = tab
 [{*.json,*.yaml}]
 indent_style = space
 indent_size = 2
+
+# JavaScript and TypeScript files
+[{*.js,*.cjs,*.mjs,*.jsx,*.mjsx,*.ts,*.cts,*.mts,*.tsx,*.mtsx}]
+indent_style = space
+indent_size = 2

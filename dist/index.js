@@ -43223,7 +43223,6 @@ async function runAction() {
     }
 }
 
-// Copyright 2023 Google LLC
 // Copyright 2025 Ian Lewis
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
