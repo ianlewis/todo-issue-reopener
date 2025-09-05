@@ -1,4 +1,4 @@
-# Copyright 2025 Ian Lewis
+# Copyright 2024 Ian Lewis
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,11 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This is a markdownlint config for issue and pull request templates.
+name: eslint
 
-extends: "../.markdownlint.yaml"
+on:
+  workflow_call:
 
-# MD041/first-line-heading/first-line-h1 : First line in a file should be a
-# top-level heading :
-# https://github.com/DavidAnson/markdownlint/blob/v0.37.4/doc/md041.md
-MD041: false
+permissions:
+  contents: read
+
+jobs:
+  eslint:
+    name: eslint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: ".node-version"
+      - run: make eslint

@@ -21,7 +21,7 @@ export default {
   collectCoverageFrom: ["./src/**"],
   coverageDirectory: "./coverage",
   coveragePathIgnorePatterns: ["/node_modules/", "/dist/"],
-  coverageReporters: ["json-summary", "text", "lcov"],
+  coverageReporters: ["clover", "json", "json-summary", "text", "lcov"],
   extensionsToTreatAsEsm: [".ts"],
   moduleFileExtensions: ["ts", "js"],
   preset: "ts-jest",
