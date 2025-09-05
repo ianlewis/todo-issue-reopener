@@ -26,8 +26,13 @@ rules:
       - "SLSA" # Supply Chain Levels for Software Artifacts
       - "/[Cc]odebase/"
 
+      # Terminology
+      - "Codecov" # Code coverage service
+      - "ESM" # ECMAScript Modules
+
       - "CHANGELOG"
       - "CODEOWNER"
+      - "CLA"
       - "CLI"
       - "CVSS"
       - "DCO"
@@ -48,6 +53,9 @@ rules:
       - "/[Ff]ormatter/"
       - "/[Ll]inter/"
       - "/[Pp]re/"
+      - "/[Rr]ebase/"
+      - "/[Rr]eproducibility/"
+      - "/[Rr]uleset/"
       - "/[Rr]untime/"
       - "/[Ss]exualized/"
       - "/[Ss]ocio-economic/"

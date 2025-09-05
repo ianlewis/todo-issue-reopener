@@ -19,10 +19,26 @@
     // https://docs.renovatebot.com/presets-customManagers/#custommanagersmakefileversions
     "customManagers:makefileVersions",
   ],
+  // NOTE: Set the prHourlyLimit to 0 to disable the hourly limit. This is done
+  // because we are using a monthly schedule and the default hourly limit of 2
+  // would cause Renovate to only create 2 PRs every month.
+  prHourlyLimit: 0,
 
-  // Security alerts/updates happen more frequently.
+  // Security alerts/updates.
   vulnerabilityAlerts: {
-    schedule: "* 0-4 * * *",
+    enabled: true,
+    // Explicitly set the schedule to "at any time" to ensure that security
+    // update PRs are created as soon as possible.
+    schedule: ["at any time"],
+  },
+  osvVulnerabilityAlerts: true,
+
+  // Enable the lock file maintenance feature to keep transitive dependencies up
+  // to date.
+  lockFileMaintenance: {
+    enabled: true,
+    // NOTE: Same as schedule:monthly preset.
+    schedule: ["* 0-3 1 * *"],
   },
 
   // Create a new issue for each config warning. By default, Renovate re-opens
@@ -32,6 +48,16 @@
 
   // Group various ecosystem updates. Security updates are always separate.
   packageRules: [
+    {
+      matchUpdateTypes: ["minor", "patch"],
+      groupName: "aqua",
+      matchFileNames: [".aqua.yaml", ".aqua-checksums.yaml"],
+    },
+    {
+      matchUpdateTypes: ["minor", "patch"],
+      groupName: "makefile",
+      matchFileNames: ["Makefile"],
+    },
     {
       matchManagers: ["github-actions"],
       matchUpdateTypes: ["minor", "patch"],
