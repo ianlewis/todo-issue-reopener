@@ -1,6 +1,6 @@
 # `todo-issue-reopener`
 
-[![tests](https://github.com/ianlewis/todo-issue-reopener/actions/workflows/pre-submit.units.yml/badge.svg)](https://github.com/ianlewis/todo-issue-reopener/actions/workflows/pre-submit.units.yml)
+[![tests](https://github.com/ianlewis/todo-issue-reopener/actions/workflows/pull_request.tests.yml/badge.svg)](https://github.com/ianlewis/todo-issue-reopener/actions/workflows/pull_request.tests.yml)
 [![Codecov](https://codecov.io/gh/ianlewis/todo-issue-reopener/graph/badge.svg?token=KFDFRHMBU5)](https://codecov.io/gh/ianlewis/todo-issue-reopener)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/ianlewis/todo-issue-reopener/badge)](https://securityscorecards.dev/viewer/?uri=github.com%2Fianlewis%2Ftodo-issue-reopener)
 [![SLSA 3](https://slsa.dev/images/gh-badge-level3.svg)](https://slsa.dev)
