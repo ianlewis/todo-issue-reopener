@@ -41,7 +41,11 @@ function getAugmentedNamespace(n) {
   var f = n.default;
 	if (typeof f == "function") {
 		var a = function a () {
-			if (this instanceof a) {
+			var isInstance = false;
+      try {
+        isInstance = this instanceof a;
+      } catch {}
+			if (isInstance) {
         return Reflect.construct(f, arguments, this.constructor);
 			}
 			return f.apply(this, arguments);
@@ -37013,7 +37017,7 @@ function blockString({ comment, type, value }, ctx, onComment, onChompKeep) {
     const { blockQuote, commentString, lineWidth } = ctx.options;
     // 1. Block can't end in whitespace unless the last line is non-empty.
     // 2. Strings consisting of only whitespace are best rendered explicitly.
-    if (!blockQuote || /\n[\t ]+$/.test(value) || /^\s*$/.test(value)) {
+    if (!blockQuote || /\n[\t ]+$/.test(value)) {
         return quotedString(value, ctx);
     }
     const indent = ctx.indent ||
