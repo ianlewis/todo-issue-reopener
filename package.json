@@ -30,7 +30,7 @@
     "@actions/tool-cache": "^2.0.2",
     "@octokit/core": "^5.2.1",
     "@octokit/plugin-retry": "^6.1.0",
-    "uuid": "^11.1.0",
+    "uuid": "^14.0.0",
     "yaml": "^2.6.0"
   },
   "devDependencies": {
