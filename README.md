@@ -38,9 +38,17 @@ checkout.
 
 ```yaml
 on:
+    # Allow manual triggering.
     workflow_dispatch:
+    # push[main] will catch changes to TODOs in code.
+    push:
+        branches: [main]
+    # issues[closed] will catch issues closed manually that contain TODOs.
+    issues:
+        types: [closed]
+    # schedule will periodically reconcile and catch any missed TODOs.
     schedule:
-        - cron: "0 0 * * *"
+        - cron: "0 0 1 * *"
 
 permissions: {}
 
