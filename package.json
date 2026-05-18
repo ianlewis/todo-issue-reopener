@@ -58,7 +58,7 @@
     "markdownlint-cli": "0.45.0",
     "prettier": "3.6.2",
     "prettier-eslint": "16.4.2",
-    "renovate": "41.127.2",
+    "renovate": "42.68.5",
     "rollup": "4.52.2",
     "textlint": "15.2.2",
     "textlint-filter-rule-comments": "1.2.2",
