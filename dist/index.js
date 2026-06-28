@@ -39593,7 +39593,7 @@ async function downloadAndVerifySLSA(url, provenanceURL, sourceURI, sourceTag, s
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // renovate: datasource=github-releases depName=ianlewis/todos versioning=loose
-const TODOS_VERSION = "v0.13.0";
+const TODOS_VERSION = "v0.14.0";
 // renovate: datasource=github-releases depName=slsa-framework/slsa-verifier versioning=loose
 const SLSA_VERIFIER_VERSION = "v2.7.0";
 // See: https://github.com/slsa-framework/slsa-verifier/blob/main/SHA256SUM.md
