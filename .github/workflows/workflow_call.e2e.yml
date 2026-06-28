@@ -27,7 +27,7 @@ jobs:
     outputs:
       issue-url: ${{ steps.create-issue.outputs.url }}
     permissions:
-      issues: write
+      issues: write # Required to create issues for the test
     steps:
       - name: Checkout action
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
@@ -97,7 +97,7 @@ jobs:
     needs: issue-reopener-basic
     if: ${{ always() }}
     permissions:
-      issues: write
+      issues: write # Required to create issues for the test
     steps:
       - env:
           ISSUE_URL: ${{ needs.issue-reopener-basic.outputs.issue-url }}
@@ -112,7 +112,7 @@ jobs:
     outputs:
       issue-url: ${{ steps.create-issue.outputs.url }}
     permissions:
-      issues: write
+      issues: write # Required to create issues for the test
     steps:
       - name: Checkout action
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
@@ -170,7 +170,7 @@ jobs:
     needs: issue-reopener-path
     if: ${{ always() }}
     permissions:
-      issues: write
+      issues: write # Required to create issues for the test
     steps:
       - env:
           ISSUE_URL: ${{ needs.issue-reopener-path.outputs.issue-url }}
@@ -185,7 +185,7 @@ jobs:
     outputs:
       issue-url: ${{ steps.create-issue.outputs.url }}
     permissions:
-      issues: write
+      issues: write # Required to create issues for the test
     steps:
       - name: Checkout action
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
@@ -252,7 +252,7 @@ jobs:
     needs: issue-reopener-dry-run
     if: ${{ always() }}
     permissions:
-      issues: write
+      issues: write # Required to create issues for the test
     steps:
       - env:
           ISSUE_URL: ${{ needs.issue-reopener-dry-run.outputs.issue-url }}
@@ -267,7 +267,7 @@ jobs:
     outputs:
       issue-url: ${{ steps.create-issue.outputs.url }}
     permissions:
-      issues: write
+      issues: write # Required to create issues for the test
     steps:
       - name: Checkout action
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
@@ -327,7 +327,7 @@ jobs:
     needs: issue-reopener-subdir
     if: ${{ always() }}
     permissions:
-      issues: write
+      issues: write # Required to create issues for the test
     steps:
       - env:
           ISSUE_URL: ${{ needs.issue-reopener-subdir.outputs.issue-url }}
@@ -342,7 +342,7 @@ jobs:
     outputs:
       issue-url: ${{ steps.create-issue.outputs.url }}
     permissions:
-      issues: write
+      issues: write # Required to create issues for the test
     steps:
       - name: Checkout action
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
@@ -419,7 +419,7 @@ jobs:
     needs: issue-reopener-vanityURLs
     if: ${{ always() }}
     permissions:
-      issues: write
+      issues: write # Required to create issues for the test
     steps:
       - env:
           ISSUE_URL: ${{ needs.issue-reopener-vanityURLs.outputs.issue-url }}

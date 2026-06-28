@@ -21,6 +21,9 @@ rules:
         # Allow the use of official GitHub CodeQL Actions
         - github/codeql-action/*
 
+        # Allow the use of the autofix-ci action
+        - autofix-ci/action
+
         # Allow the use of the todo-issue-reopener action
         - ianlewis/todo-issue-reopener
 
@@ -29,6 +32,3 @@ rules:
 
         # Allow the use of the codecov/codecov-action
         - codecov/codecov-action
-
-        # Allow the use of thehanimo/pr-title-checker action
-        - thehanimo/pr-title-checker

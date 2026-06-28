@@ -196,7 +196,7 @@ describe("downloadAndVerifySLSA", () => {
       "artifact data",
     );
 
-    expect(exec.getExecOutput).toBeCalledWith(
+    expect(exec.getExecOutput).toHaveBeenCalledWith(
       verifierPath,
       [
         "verify-artifact",

@@ -66,8 +66,8 @@ describe("runAction", () => {
 
     await action.runAction();
 
-    expect(reopener.getTODOIssues).toBeCalledWith(workspacePath, {});
-    expect(reopener.reopenIssues).toBeCalledWith([], githubToken, dryRun);
+    expect(reopener.getTODOIssues).toHaveBeenCalledWith(workspacePath, {});
+    expect(reopener.reopenIssues).toHaveBeenCalledWith([], githubToken, dryRun);
 
     expect(core.setFailed).not.toHaveBeenCalled();
   });
@@ -103,10 +103,10 @@ describe("runAction", () => {
 
     await action.runAction();
 
-    expect(reopener.getTODOIssues).toBeCalledWith(workspacePath, {});
+    expect(reopener.getTODOIssues).toHaveBeenCalledWith(workspacePath, {});
     expect(reopener.reopenIssues).not.toHaveBeenCalled();
 
-    expect(core.setFailed).toBeCalledWith(errMsg);
+    expect(core.setFailed).toHaveBeenCalledWith(errMsg);
   });
 
   it("handles reopenIssues failure", async () => {
@@ -141,9 +141,9 @@ describe("runAction", () => {
 
     await action.runAction();
 
-    expect(reopener.getTODOIssues).toBeCalledWith(workspacePath, {});
-    expect(reopener.reopenIssues).toBeCalledWith([], githubToken, dryRun);
+    expect(reopener.getTODOIssues).toHaveBeenCalledWith(workspacePath, {});
+    expect(reopener.reopenIssues).toHaveBeenCalledWith([], githubToken, dryRun);
 
-    expect(core.setFailed).toBeCalledWith(errMsg);
+    expect(core.setFailed).toHaveBeenCalledWith(errMsg);
   });
 });

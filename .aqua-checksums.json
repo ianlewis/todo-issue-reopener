@@ -1,113 +1,63 @@
 {
   "checksums": [
     {
-      "id": "github_release/github.com/ianlewis/todos/v0.12.0/todos-darwin-amd64",
-      "checksum": "6F5A294D197A0435490D0416F7F3D8B43652691C1BF9683719157E4A198C866E",
+      "id": "github_release/github.com/checkmake/checkmake/v0.3.2/checkmake-v0.3.2.darwin.amd64",
+      "checksum": "82942043A4766B9FB3FFE6C77584DF7D6C832BFA00571F234D257799F492FDD7",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/ianlewis/todos/v0.12.0/todos-darwin-arm64",
-      "checksum": "5183B349216D58048BFFFB2FCD7E449C5A593A47DD3AB95A7CF044E8DA26F6A1",
+      "id": "github_release/github.com/checkmake/checkmake/v0.3.2/checkmake-v0.3.2.darwin.arm64",
+      "checksum": "D5DAB7169D1CB246B380ED5E7FC1E6ADED301D453DB258F858E774422D25961F",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/ianlewis/todos/v0.12.0/todos-linux-amd64",
-      "checksum": "B3C1497420A023622B4ED045708F7E741472F042522C2299D839E03B8AE2A11D",
+      "id": "github_release/github.com/checkmake/checkmake/v0.3.2/checkmake-v0.3.2.linux.amd64",
+      "checksum": "E2EFFB876913F3EE2CAEF0BA35F6202C5E8A3CD55A077D8D2B9CE2034257B6AF",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/ianlewis/todos/v0.12.0/todos-linux-arm64",
-      "checksum": "2DF23EA47B4156310A541D2B8E8690E758A24DF370D32277CAA55919A4819349",
+      "id": "github_release/github.com/checkmake/checkmake/v0.3.2/checkmake-v0.3.2.linux.arm64",
+      "checksum": "409167C4ABB99407BD232C3BBD351B8A39DF57997FEAFDE5A08BDDFFB0F2DCB4",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/ianlewis/todos/v0.12.0/todos-windows-amd64.exe",
-      "checksum": "65E5278BFCAAE6C0A180FB0D00A663F0EBA5051D4850569083CCCEE6C24A8E57",
+      "id": "github_release/github.com/checkmake/checkmake/v0.3.2/checkmake-v0.3.2.windows.amd64.exe",
+      "checksum": "6ADF4BDE2DBFE8001ECF2918ABFE02F7A57191568F1D185537ECCD9C59625DCA",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/ianlewis/todos/v0.12.0/todos-windows-arm64.exe",
-      "checksum": "30A6CB23278AD6B6F9D22DF862275EB029EEC35E07A26480E30188FE6BC7A192",
+      "id": "github_release/github.com/checkmake/checkmake/v0.3.2/checkmake-v0.3.2.windows.arm64.exe",
+      "checksum": "571B6440776236A3626C5FC9AEAEF7DA78EEE625683F181AF89439028996C611",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/ianlewis/todos/v0.13.0/todos-darwin-amd64",
-      "checksum": "64DFB2F6928B543F86734F4C943CCA4726B9D33FA198A450390755E3A6A8C970",
+      "id": "github_release/github.com/ianlewis/todos/v0.14.0/todos-darwin-amd64",
+      "checksum": "D7B0CB799DF77B3EA997F1B25D92E049A60F1CEDF24073879EC59AE0569CC59A",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/ianlewis/todos/v0.13.0/todos-darwin-arm64",
-      "checksum": "48E1A1F1433351AC7E6D392EECDD5D6FA0E533A6F5F3161ED6E66F26AEDC4C06",
+      "id": "github_release/github.com/ianlewis/todos/v0.14.0/todos-darwin-arm64",
+      "checksum": "E6A052362062E2220088C5F5326D88C4545022446923E925496901D724414619",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/ianlewis/todos/v0.13.0/todos-linux-amd64",
-      "checksum": "1BC59C0274960B8D16B41B96D1ECF57D7C1BD2759EF75D6098D923C6C3845DB2",
+      "id": "github_release/github.com/ianlewis/todos/v0.14.0/todos-linux-amd64",
+      "checksum": "A45A7237B21A94F072CC9AE79B139761683A7B48CEB5BA2EA53570DB37304FD4",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/ianlewis/todos/v0.13.0/todos-linux-arm64",
-      "checksum": "B61656F43EB38258BFAB44D29304BFC239FF8BB262888B8F1DBAA6702A45B0EE",
+      "id": "github_release/github.com/ianlewis/todos/v0.14.0/todos-linux-arm64",
+      "checksum": "76BE56822A78ACAC36889B98BD265AD6E0A1CBD3B04B5CA757D0683E45D173E3",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/ianlewis/todos/v0.13.0/todos-windows-amd64.exe",
-      "checksum": "15F06471A1D1D56CFC7E7C97AAFF437001197351B463507ECFD325838040BA92",
+      "id": "github_release/github.com/ianlewis/todos/v0.14.0/todos-windows-amd64.exe",
+      "checksum": "CE5384F10EC3F97F3772FEB508A22E303231F4DE99CF1F52CAE69C8CB918A7E3",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/ianlewis/todos/v0.13.0/todos-windows-arm64.exe",
-      "checksum": "456E06977AE35521447017FF2D15865BB8F55501FA40B3F3963C8582B1CBCCFE",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/jqlang/jq/jq-1.7.1/jq-linux-amd64",
-      "checksum": "5942C9B0934E510EE61EB3E30273F1B3FE2590DF93933A93D7C58B81D19C8FF5",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/jqlang/jq/jq-1.7.1/jq-linux-arm64",
-      "checksum": "4DD2D8A0661DF0B22F1BB9A1F9830F06B6F3B8F7D91211A1EF5D7C4F06A8B4A5",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/jqlang/jq/jq-1.7.1/jq-macos-amd64",
-      "checksum": "4155822BBF5EA90F5C79CF254665975EB4274D426D0709770C21774DE5407443",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/jqlang/jq/jq-1.7.1/jq-macos-arm64",
-      "checksum": "0BBE619E663E0DE2C550BE2FE0D240D076799D6F8A652B70FA04AEA8A8362E8A",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/jqlang/jq/jq-1.7.1/jq-windows-amd64.exe",
-      "checksum": "7451FBBF37FEFFB9BF262BD97C54F0DA558C63F0748E64152DD87B0A07B6D6AB",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/jqlang/jq/jq-1.8.0/jq-linux-amd64",
-      "checksum": "8926C33326111BCD67A47A970B5A5DB933EF9194AD925994934C639C76A0605C",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/jqlang/jq/jq-1.8.0/jq-linux-arm64",
-      "checksum": "1084E6BF5060A463DAF77193888D326C83E56BCFBC18A52E6EAA99DBE82A8B54",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/jqlang/jq/jq-1.8.0/jq-macos-amd64",
-      "checksum": "A594F3740BF570F0DBC43FF102A9034C17719D1BB5B40F0192751234D67F172A",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/jqlang/jq/jq-1.8.0/jq-macos-arm64",
-      "checksum": "AAF1EFBB376D6E3EAF61F63807C32C1DF519F5857DFC4F581826FA2DF4B715AE",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/jqlang/jq/jq-1.8.0/jq-windows-amd64.exe",
-      "checksum": "B45FCBB27DCB9E9848AC39889A8BF86457B8D9D31E7C56387C6EAB80008FD1F4",
+      "id": "github_release/github.com/ianlewis/todos/v0.14.0/todos-windows-arm64.exe",
+      "checksum": "3D2B8C119100B54C8695BA12A98B4A3645549F4869D2C86802EA895C18348424",
       "algorithm": "sha256"
     },
     {
@@ -136,31 +86,6 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/koalaman/shellcheck/v0.10.0/shellcheck-v0.10.0.darwin.aarch64.tar.xz",
-      "checksum": "BBD2F14826328EEE7679DA7221F2BC3AFB011F6A928B848C80C321F6046DDF81",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/koalaman/shellcheck/v0.10.0/shellcheck-v0.10.0.darwin.x86_64.tar.xz",
-      "checksum": "EF27684F23279D112D8AD84E0823642E43F838993BBB8C0963DB9B58A90464C2",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/koalaman/shellcheck/v0.10.0/shellcheck-v0.10.0.linux.aarch64.tar.xz",
-      "checksum": "324A7E89DE8FA2AED0D0C28F3DAB59CF84C6D74264022C00C22AF665ED1A09BB",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/koalaman/shellcheck/v0.10.0/shellcheck-v0.10.0.linux.x86_64.tar.xz",
-      "checksum": "6C881AB0698E4E6EA235245F22832860544F17BA386442FE7E9D629F8CBEDF87",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/koalaman/shellcheck/v0.10.0/shellcheck-v0.10.0.zip",
-      "checksum": "EB6CD53A54EA97A56540E9D296CE7E2FA68715AA507FF23574646C1E12B2E143",
-      "algorithm": "sha256"
-    },
-    {
       "id": "github_release/github.com/koalaman/shellcheck/v0.11.0/shellcheck-v0.11.0.darwin.aarch64.tar.xz",
       "checksum": "56AFFDD8DE5527894DCA6DC3D7E0A99A873B0F004D7AABC30AE407D3F48B0A79",
       "algorithm": "sha256"
@@ -186,79 +111,39 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/rhysd/actionlint/v1.7.7/actionlint_1.7.7_darwin_amd64.tar.gz",
-      "checksum": "28E5DE5A05FC558474F638323D736D822FFF183D2D492F0AECB2B73CC44584F5",
+      "id": "github_release/github.com/rhysd/actionlint/v1.7.12/actionlint_1.7.12_darwin_amd64.tar.gz",
+      "checksum": "5B44C3BC2255115C9B69E30EFC0FECDF498FDB63C5D58E17084FD5F16324C644",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/rhysd/actionlint/v1.7.7/actionlint_1.7.7_darwin_arm64.tar.gz",
-      "checksum": "2693315B9093AEACB4EBD91A993FEA54FC215057BF0DA2659056B4BC033873DB",
+      "id": "github_release/github.com/rhysd/actionlint/v1.7.12/actionlint_1.7.12_darwin_arm64.tar.gz",
+      "checksum": "ABA9CED2DEE8D27FECCA3DC7FEB1A7F9A52CAEFA1EB46F3271EA66B6E0E6953F",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/rhysd/actionlint/v1.7.7/actionlint_1.7.7_linux_amd64.tar.gz",
-      "checksum": "023070A287CD8CCCD71515FEDC843F1985BF96C436B7EFFAECCE67290E7E0757",
+      "id": "github_release/github.com/rhysd/actionlint/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz",
+      "checksum": "8ACA8DB96F1B94770F1B0D72B6DDDCB1EBB8123CB3712530B08CC387B349A3D8",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/rhysd/actionlint/v1.7.7/actionlint_1.7.7_linux_arm64.tar.gz",
-      "checksum": "401942F9C24ED71E4FE71B76C7D638F66D8633575C4016EFD2977CE7C28317D0",
+      "id": "github_release/github.com/rhysd/actionlint/v1.7.12/actionlint_1.7.12_linux_arm64.tar.gz",
+      "checksum": "325E971B6BA9BFA504672E29BE93C24981EEB1C07576D730E9F7C8805AFFF0C6",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/rhysd/actionlint/v1.7.7/actionlint_1.7.7_windows_amd64.zip",
-      "checksum": "7F12F1801BCA3D480D67AAF7774F4C2A6359A3CA8EEBE382C95C10C9704AA731",
+      "id": "github_release/github.com/rhysd/actionlint/v1.7.12/actionlint_1.7.12_windows_amd64.zip",
+      "checksum": "6E7241B51E6817EA6A047693D8E6FED13B31819C9A0DD6C5A726E1592D22F6E9",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/rhysd/actionlint/v1.7.7/actionlint_1.7.7_windows_arm64.zip",
-      "checksum": "76E9514CFAC18E5677AA04F3A89873C981F16A2F2353BB97372A86CD09B1F5A8",
+      "id": "github_release/github.com/rhysd/actionlint/v1.7.12/actionlint_1.7.12_windows_arm64.zip",
+      "checksum": "CADCF7EA4EFE3A68728893813643CEBE1185E5B1D4BE5B96245F65C9A4D5EA41",
       "algorithm": "sha256"
     },
     {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/registry.yaml",
-      "checksum": "D836ECD0F1FA3B9F2D850BAE72922CA7DDF8F82B98A78C572762ABB70F8020EC87DF4B4D1F3C1F6A3F519FE134676145B5635104C3B8D8B6545163981E99F1FC",
-      "algorithm": "sha512"
-    },
-    {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.333.1/registry.yaml",
-      "checksum": "9DBB73AF6D587E7696230A00BF9AD1A4D1B62512D5C179D55A5B471F332FF52E",
+      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.529.1/registry.yaml",
+      "checksum": "37DAF14E094ADB1666A9A5135E4CADD2212CF631CC9AC92E0776A437FB9E5E6D",
       "algorithm": "sha256"
-    },
-    {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.335.0/registry.yaml",
-      "checksum": "227996226562CC18DD591C7C6E4C66EC7B83B1887AD43C94C3F7E641C7883CF1E86F3772102CF28DFA8DA81A9AB4E67030FF5023E718C30AEA133F16145DAEFF",
-      "algorithm": "sha512"
-    },
-    {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.364.0/registry.yaml",
-      "checksum": "799600A73C2BFD11303016AF39AC934A291FB3E5CAE59836312B0CA66B839ADE7FF2E7A622B07188BA81B0DEAD49CF17816AC9ED5F9ACA4EC9A0597EB2A96807",
-      "algorithm": "sha512"
-    },
-    {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.366.0/registry.yaml",
-      "checksum": "2AB10879875CD2393ABEABDF5E6A449030D7CFB7C3C1D29258E72B065008C2A9940CF60782A7D6AE4D24FB2444A65D5405D31E29830DFC72646D6CB1A6D60E51",
-      "algorithm": "sha512"
-    },
-    {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.374.0/registry.yaml",
-      "checksum": "F6EF8FAE28FDCD869BA071BB763686FA3B117E10F32A414B460924336F83B22B",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.377.0/registry.yaml",
-      "checksum": "35E6916821352C8E73A3A0394D86528F44012D1EC08B6CD690CF114CECA4F88F",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.381.1/registry.yaml",
-      "checksum": "D836ECD0F1FA3B9F2D850BAE72922CA7DDF8F82B98A78C572762ABB70F8020EC87DF4B4D1F3C1F6A3F519FE134676145B5635104C3B8D8B6545163981E99F1FC",
-      "algorithm": "sha512"
-    },
-    {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.398.0/registry.yaml",
-      "checksum": "7ECB8D2982D9147B59B8EE0FD7F01EEAEAA542BC9AD2A6E57E3FF250CB9FA8233347CC963ACC5BE4E0527B4E6967DA88613D99952B0BC42CCBE7C0FC60C562C5",
-      "algorithm": "sha512"
     }
   ]
 }

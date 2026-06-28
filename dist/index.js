@@ -28474,13 +28474,28 @@ const createTokenAuth = function createTokenAuth2(token) {
 // pkg/dist-src/index.js
 
 // pkg/dist-src/version.js
-var VERSION$3 = "5.2.1";
+var VERSION$3 = "5.2.2";
 
 // pkg/dist-src/index.js
 var noop = () => {
 };
 var consoleWarn = console.warn.bind(console);
 var consoleError = console.error.bind(console);
+function createLogger(logger = {}) {
+  if (typeof logger.debug !== "function") {
+    logger.debug = noop;
+  }
+  if (typeof logger.info !== "function") {
+    logger.info = noop;
+  }
+  if (typeof logger.warn !== "function") {
+    logger.warn = consoleWarn;
+  }
+  if (typeof logger.error !== "function") {
+    logger.error = consoleError;
+  }
+  return logger;
+}
 var userAgentTrail = `octokit-core.js/${VERSION$3} ${getUserAgent()}`;
 var Octokit = class {
   static {
@@ -28554,15 +28569,7 @@ var Octokit = class {
     }
     this.request = request.defaults(requestDefaults);
     this.graphql = withCustomRequest(this.request).defaults(requestDefaults);
-    this.log = Object.assign(
-      {
-        debug: noop,
-        info: noop,
-        warn: consoleWarn,
-        error: consoleError
-      },
-      options.log
-    );
+    this.log = createLogger(options.log);
     this.hook = hook;
     if (!options.authStrategy) {
       if (!options.auth) {
@@ -36359,6 +36366,8 @@ class Alias extends NodeBase {
      * instance of the `source` anchor before this node.
      */
     resolve(doc, ctx) {
+        if (ctx?.maxAliasCount === 0)
+            throw new ReferenceError('Alias resolution is disabled');
         let nodes;
         if (ctx?.aliasResolveCache) {
             nodes = ctx.aliasResolveCache;
@@ -36399,7 +36408,7 @@ class Alias extends NodeBase {
             data = anchors.get(source);
         }
         /* istanbul ignore if */
-        if (!data || data.res === undefined) {
+        if (data?.res === undefined) {
             const msg = 'This should not happen: Alias anchor was not resolved?';
             throw new ReferenceError(msg);
         }
@@ -37208,6 +37217,7 @@ function createStringifyContext(doc, options) {
         nullStr: 'null',
         simpleKeys: false,
         singleQuote: null,
+        trailingComma: false,
         trueStr: 'true',
         verifyAliasOrder: true
     }, doc.schema.toStringOptions, options);
@@ -37411,7 +37421,7 @@ function stringifyPair({ key, value }, ctx, onComment, onChompKeep) {
             ws += `\n${indentComment(cs, ctx.indent)}`;
         }
         if (valueStr === '' && !ctx.inFlow) {
-            if (ws === '\n')
+            if (ws === '\n' && valueComment)
                 ws = '\n\n';
         }
         else {
@@ -37488,18 +37498,18 @@ const isMergeKey = (ctx, key) => (merge.identify(key) ||
         merge.identify(key.value))) &&
     ctx?.doc.schema.tags.some(tag => tag.tag === merge.tag && tag.default);
 function addMergeToJSMap(ctx, map, value) {
-    value = ctx && isAlias(value) ? value.resolve(ctx.doc) : value;
-    if (isSeq(value))
-        for (const it of value.items)
+    const source = resolveAliasValue(ctx, value);
+    if (isSeq(source))
+        for (const it of source.items)
             mergeValue(ctx, map, it);
-    else if (Array.isArray(value))
-        for (const it of value)
+    else if (Array.isArray(source))
+        for (const it of source)
             mergeValue(ctx, map, it);
     else
-        mergeValue(ctx, map, value);
+        mergeValue(ctx, map, source);
 }
 function mergeValue(ctx, map, value) {
-    const source = ctx && isAlias(value) ? value.resolve(ctx.doc) : value;
+    const source = resolveAliasValue(ctx, value);
     if (!isMap(source))
         throw new Error('Merge sources must be maps or map aliases');
     const srcMap = source.toJSON(null, ctx, Map);
@@ -37521,6 +37531,9 @@ function mergeValue(ctx, map, value) {
         }
     }
     return map;
+}
+function resolveAliasValue(ctx, value) {
+    return ctx && isAlias(value) ? value.resolve(ctx.doc, ctx) : value;
 }
 
 function addPairToJSMap(ctx, map, { key, value }) {
@@ -37709,12 +37722,22 @@ function stringifyFlowCollection({ items }, ctx, { flowChars, itemIndent }) {
         if (comment)
             reqNewline = true;
         let str = stringify$2(item, itemCtx, () => (comment = null));
-        if (i < items.length - 1)
+        reqNewline || (reqNewline = lines.length > linesAtValue || str.includes('\n'));
+        if (i < items.length - 1) {
             str += ',';
+        }
+        else if (ctx.options.trailingComma) {
+            if (ctx.options.lineWidth > 0) {
+                reqNewline || (reqNewline = lines.reduce((sum, line) => sum + line.length + 2, 2) +
+                    (str.length + 2) >
+                    ctx.options.lineWidth);
+            }
+            if (reqNewline) {
+                str += ',';
+            }
+        }
         if (comment)
             str += lineComment(str, itemIndent, commentString(comment));
-        if (!reqNewline && (lines.length > linesAtValue || str.includes('\n')))
-            reqNewline = true;
         lines.push(str);
         linesAtValue = lines.length;
     }
@@ -38059,11 +38082,12 @@ function stringifyNumber({ format, minFractionDigits, tag, value }) {
     const num = typeof value === 'number' ? value : Number(value);
     if (!isFinite(num))
         return isNaN(num) ? '.nan' : num < 0 ? '-.inf' : '.inf';
-    let n = JSON.stringify(value);
+    let n = Object.is(value, -0) ? '-0' : JSON.stringify(value);
     if (!format &&
         minFractionDigits &&
         (!tag || tag === 'tag:yaml.org,2002:float') &&
-        /^\d/.test(n)) {
+        /^-?\d/.test(n) &&
+        !n.includes('e')) {
         let i = n.indexOf('.');
         if (i < 0) {
             i = n.length;
@@ -39315,7 +39339,7 @@ const prettifyError = (src, lc) => (error) => {
     if (/[^ ]/.test(lineStr)) {
         let count = 1;
         const end = error.linePos[1];
-        if (end && end.line === line && end.col > col) {
+        if (end?.line === line && end.col > col) {
             count = Math.max(1, Math.min(end.col - col, 80 - ci));
         }
         const pointer = ' '.repeat(ci) + '^'.repeat(count);
@@ -39650,7 +39674,7 @@ function resolveBlockSeq({ composeNode, composeEmptyNode }, ctx, bs, onError, ta
         });
         if (!props.found) {
             if (props.anchor || props.tag || value) {
-                if (value && value.type === 'block-seq')
+                if (value?.type === 'block-seq')
                     onError(props.end, 'BAD_INDENT', 'All sequence items must start at the same column');
                 else
                     onError(offset, 'MISSING_CHAR', 'Sequence item without - indicator');
@@ -39836,7 +39860,7 @@ function resolveFlowCollection({ composeNode, composeEmptyNode }, ctx, fc, onErr
                 }
             }
             else if (value) {
-                if ('source' in value && value.source && value.source[0] === ':')
+                if ('source' in value && value.source?.[0] === ':')
                     onError(value, 'MISSING_CHAR', `Missing space after : in ${fcName}`);
                 else
                     onError(valueProps.start, 'MISSING_CHAR', `Missing , or : between ${fcName} items`);
@@ -39880,7 +39904,7 @@ function resolveFlowCollection({ composeNode, composeEmptyNode }, ctx, fc, onErr
     const expectedEnd = isMap ? '}' : ']';
     const [ce, ...ee] = fc.end;
     let cePos = offset;
-    if (ce && ce.source === expectedEnd)
+    if (ce?.source === expectedEnd)
         cePos = ce.offset + ce.source.length;
     else {
         const name = fcName[0].toUpperCase() + fcName.substring(1);
@@ -39960,7 +39984,7 @@ function composeCollection(CN, ctx, token, props, onError) {
     let tag = ctx.schema.tags.find(t => t.tag === tagName && t.collection === expType);
     if (!tag) {
         const kt = ctx.schema.knownTags[tagName];
-        if (kt && kt.collection === expType) {
+        if (kt?.collection === expType) {
             ctx.schema.tags.push(Object.assign({}, kt, { default: false }));
             tag = kt;
         }
@@ -40322,7 +40346,7 @@ function doubleQuotedValue(source, onError) {
                     next = source[++i + 1];
             }
             else if (next === 'x' || next === 'u' || next === 'U') {
-                const length = { x: 2, u: 4, U: 8 }[next];
+                const length = next === 'x' ? 2 : next === 'u' ? 4 : 8;
                 res += parseCharCode(source, i + 1, length, onError);
                 i += length;
             }
@@ -40392,12 +40416,14 @@ function parseCharCode(source, offset, length, onError) {
     const cc = source.substr(offset, length);
     const ok = cc.length === length && /^[0-9a-fA-F]+$/.test(cc);
     const code = ok ? parseInt(cc, 16) : NaN;
-    if (isNaN(code)) {
+    try {
+        return String.fromCodePoint(code);
+    }
+    catch {
         const raw = source.substr(offset - 2, length + 2);
         onError(offset - 2, 'BAD_DQ_ESCAPE', `Invalid escape sequence ${raw}`);
         return raw;
     }
-    return String.fromCodePoint(code);
 }
 
 function composeScalar(ctx, token, tagToken, onError) {
@@ -40528,19 +40554,26 @@ function composeNode(ctx, token, props, onError) {
         case 'block-map':
         case 'block-seq':
         case 'flow-collection':
-            node = composeCollection(CN, ctx, token, props, onError);
-            if (anchor)
-                node.anchor = anchor.source.substring(1);
+            try {
+                node = composeCollection(CN, ctx, token, props, onError);
+                if (anchor)
+                    node.anchor = anchor.source.substring(1);
+            }
+            catch (error) {
+                // Almost certainly here due to a stack overflow
+                const message = error instanceof Error ? error.message : String(error);
+                onError(token, 'RESOURCE_EXHAUSTION', message);
+            }
             break;
         default: {
             const message = token.type === 'error'
                 ? token.message
                 : `Unsupported token (type: ${token.type})`;
             onError(token, 'UNEXPECTED_TOKEN', message);
-            node = composeEmptyNode(ctx, token.offset, undefined, null, props, onError);
             isSrcToken = false;
         }
     }
+    node ?? (node = composeEmptyNode(ctx, token.offset, undefined, null, props, onError));
     if (anchor && node.anchor === '')
         onError(anchor, 'BAD_ALIAS', 'Anchor cannot be an empty string');
     if (atKey &&
@@ -40725,8 +40758,10 @@ class Composer {
             }
         }
         if (afterDoc) {
-            Array.prototype.push.apply(doc.errors, this.errors);
-            Array.prototype.push.apply(doc.warnings, this.warnings);
+            for (let i = 0; i < this.errors.length; ++i)
+                doc.errors.push(this.errors[i]);
+            for (let i = 0; i < this.warnings.length; ++i)
+                doc.warnings.push(this.warnings[i]);
         }
         else {
             doc.errors = this.errors;
@@ -41629,7 +41664,7 @@ class Lexer {
             const n = (yield* this.pushCount(1)) + (yield* this.pushSpaces(true));
             this.indentNext = this.indentValue + 1;
             this.indentValue += n;
-            return yield* this.parseBlockStart();
+            return 'block-start';
         }
         return 'doc';
     }
@@ -41950,32 +41985,36 @@ class Lexer {
         return 0;
     }
     *pushIndicators() {
-        switch (this.charAt(0)) {
-            case '!':
-                return ((yield* this.pushTag()) +
-                    (yield* this.pushSpaces(true)) +
-                    (yield* this.pushIndicators()));
-            case '&':
-                return ((yield* this.pushUntil(isNotAnchorChar)) +
-                    (yield* this.pushSpaces(true)) +
-                    (yield* this.pushIndicators()));
-            case '-': // this is an error
-            case '?': // this is an error outside flow collections
-            case ':': {
-                const inFlow = this.flowLevel > 0;
-                const ch1 = this.charAt(1);
-                if (isEmpty(ch1) || (inFlow && flowIndicatorChars.has(ch1))) {
-                    if (!inFlow)
-                        this.indentNext = this.indentValue + 1;
-                    else if (this.flowKey)
-                        this.flowKey = false;
-                    return ((yield* this.pushCount(1)) +
-                        (yield* this.pushSpaces(true)) +
-                        (yield* this.pushIndicators()));
+        let n = 0;
+        loop: while (true) {
+            switch (this.charAt(0)) {
+                case '!':
+                    n += yield* this.pushTag();
+                    n += yield* this.pushSpaces(true);
+                    continue loop;
+                case '&':
+                    n += yield* this.pushUntil(isNotAnchorChar);
+                    n += yield* this.pushSpaces(true);
+                    continue loop;
+                case '-': // this is an error
+                case '?': // this is an error outside flow collections
+                case ':': {
+                    const inFlow = this.flowLevel > 0;
+                    const ch1 = this.charAt(1);
+                    if (isEmpty(ch1) || (inFlow && flowIndicatorChars.has(ch1))) {
+                        if (!inFlow)
+                            this.indentNext = this.indentValue + 1;
+                        else if (this.flowKey)
+                            this.flowKey = false;
+                        n += yield* this.pushCount(1);
+                        n += yield* this.pushSpaces(true);
+                        continue loop;
+                    }
                 }
             }
+            break loop;
         }
-        return 0;
+        return n;
     }
     *pushTag() {
         if (this.charAt(1) === '<') {
@@ -42137,6 +42176,14 @@ function getFirstKeyStartProps(prev) {
     }
     return prev.splice(i, prev.length);
 }
+function arrayPushArray(target, source) {
+    // May exhaust call stack with large `source` array
+    if (source.length < 1e5)
+        Array.prototype.push.apply(target, source);
+    else
+        for (let i = 0; i < source.length; ++i)
+            target.push(source[i]);
+}
 function fixFlowSeqItems(fc) {
     if (fc.start.type === 'flow-seq-start') {
         for (const it of fc.items) {
@@ -42149,12 +42196,12 @@ function fixFlowSeqItems(fc) {
                 delete it.key;
                 if (isFlowToken(it.value)) {
                     if (it.value.end)
-                        Array.prototype.push.apply(it.value.end, it.sep);
+                        arrayPushArray(it.value.end, it.sep);
                     else
                         it.value.end = it.sep;
                 }
                 else
-                    Array.prototype.push.apply(it.start, it.sep);
+                    arrayPushArray(it.start, it.sep);
                 delete it.sep;
             }
         }
@@ -42296,7 +42343,7 @@ class Parser {
     }
     *step() {
         const top = this.peek(1);
-        if (this.type === 'doc-end' && (!top || top.type !== 'doc-end')) {
+        if (this.type === 'doc-end' && top?.type !== 'doc-end') {
             while (this.stack.length > 0)
                 yield* this.pop();
             this.stack.push({
@@ -42572,7 +42619,7 @@ class Parser {
                         const prev = map.items[map.items.length - 2];
                         const end = prev?.value?.end;
                         if (Array.isArray(end)) {
-                            Array.prototype.push.apply(end, it.start);
+                            arrayPushArray(end, it.start);
                             end.push(this.sourceToken);
                             map.items.pop();
                             return;
@@ -42787,7 +42834,7 @@ class Parser {
                         const prev = seq.items[seq.items.length - 2];
                         const end = prev?.value?.end;
                         if (Array.isArray(end)) {
-                            Array.prototype.push.apply(end, it.start);
+                            arrayPushArray(end, it.start);
                             end.push(this.sourceToken);
                             seq.items.pop();
                             return;
@@ -42828,7 +42875,7 @@ class Parser {
             do {
                 yield* this.pop();
                 top = this.peek(1);
-            } while (top && top.type === 'flow-collection');
+            } while (top?.type === 'flow-collection');
         }
         else if (fc.end.length === 0) {
             switch (this.type) {

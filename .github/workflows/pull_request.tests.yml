@@ -26,40 +26,43 @@ on:
 permissions:
   contents: read # Needed to check out the repo.
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 # NOTE: We use simple job names because these are used in branch rulesets and
 #       are matched by name. This makes the job names an identifier rather than
 #       just a human-readable label.
-
 jobs:
-  tests:
-    uses: ./.github/workflows/workflow_call.tests.yml
+  # tests
+  ###############################
+  unit-test:
+    uses: ./.github/workflows/workflow_call.unit-test.yml
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-  check-dist:
-    uses: ./.github/workflows/workflow_call.check-dist.yml
 
   # End-to-end tests
   e2e:
     permissions:
-      contents: read
-      issues: write
+      contents: read # Required to check out the repo.
+      issues: write # Required to create issues the e2e tests.
     uses: ./.github/workflows/workflow_call.e2e.yml
 
-  # Check license headers
+  # format-check
   ###############################
-  license-headers:
-    uses: ./.github/workflows/workflow_call.license-headers.yml
-
-  # formatting
-  ###############################
-  formatting:
-    uses: ./.github/workflows/workflow_call.formatting.yml
+  format-check:
+    uses: ./.github/workflows/workflow_call.format-check.yml
 
   # linters
   ###############################
   actionlint:
     uses: ./.github/workflows/workflow_call.actionlint.yml
+
+  check-dist:
+    uses: ./.github/workflows/workflow_call.check-dist.yml
+
+  checkmake:
+    uses: ./.github/workflows/workflow_call.checkmake.yml
 
   commitlint:
     uses: ./.github/workflows/workflow_call.commitlint.yml
@@ -84,6 +87,6 @@ jobs:
 
   zizmor:
     permissions:
-      contents: read
-      security-events: write
+      contents: read # Needed for private repositories.
+      security-events: write # Needed to upload SARIF results.
     uses: ./.github/workflows/workflow_call.zizmor.yml

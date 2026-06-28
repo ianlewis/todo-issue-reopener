@@ -706,7 +706,7 @@ describe("labelMatch", () => {
       vanityURLs: ["^golang.org/issues/(?<id>[a-z]*$"],
     });
     expect(num).toBe(NaN);
-    expect(core.warning).toBeCalledWith(
+    expect(core.warning).toHaveBeenCalledWith(
       expect.stringMatching(
         `^error parsing vanity url regex: SyntaxError: Invalid regular expression:`,
       ),
