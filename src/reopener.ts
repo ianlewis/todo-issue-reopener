@@ -25,7 +25,7 @@ import * as verifier from "./verifier.js";
 import type * as config from "./config.js";
 
 // renovate: datasource=github-releases depName=ianlewis/todos versioning=loose
-const TODOS_VERSION = "v0.13.0";
+const TODOS_VERSION = "v0.14.0";
 // renovate: datasource=github-releases depName=slsa-framework/slsa-verifier versioning=loose
 const SLSA_VERIFIER_VERSION = "v2.7.0";
 // See: https://github.com/slsa-framework/slsa-verifier/blob/main/SHA256SUM.md
