@@ -1,4 +1,4 @@
-# Copyright 2024 Ian Lewis
+# Copyright 2025 Ian Lewis
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,30 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
----
-extends: default
+# This is a markdownlint config for issue and pull request templates.
 
-ignore-from-file: [.gitignore]
+extends: "../.markdownlint.yaml"
 
-rules:
-  braces:
-    max-spaces-inside: 1
-
-  comments:
-    # prettier formats comments one space from content
-    min-spaces-from-content: 1
-
-  comments-indentation: false
-
-  document-start: disable
-
-  line-length: disable
-
-  octal-values:
-    forbid-explicit-octal: true
-    forbid-implicit-octal: true
-
-  truthy:
-    allowed-values: ["true", "false"]
-    # Allow Github Actions keys like 'on'
-    check-keys: false
+# MD041/first-line-heading/first-line-h1 : First line in a file should be a
+# top-level heading :
+# https://github.com/DavidAnson/markdownlint/blob/v0.37.4/doc/md041.md
+MD041: false

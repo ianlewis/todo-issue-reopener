@@ -12,10 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Set the initial shell so we can determine extra options.
 SHELL := /usr/bin/env bash -ueo pipefail
-DEBUG_LOGGING ?= $(shell if [[ "${GITHUB_ACTIONS}" == "true" ]] && [[ -n "${RUNNER_DEBUG}" || "${ACTIONS_RUNNER_DEBUG}" == "true" || "${ACTIONS_STEP_DEBUG}" == "true" ]]; then echo "true"; else echo ""; fi)
-BASH_OPTIONS ?= $(shell if [ "$(DEBUG_LOGGING)" == "true" ]; then echo "-x"; else echo ""; fi)
+DEBUG_LOGGING ?= $(shell if [[ "$(GITHUB_ACTIONS)" == "true" ]] && [[ -n "$(RUNNER_DEBUG)" || "$(ACTIONS_RUNNER_DEBUG)" == "true" || "$(ACTIONS_STEP_DEBUG)" == "true" ]]; then echo "true"; else echo ""; fi)
+BASH_OPTIONS := $(shell if [ "$(DEBUG_LOGGING)" == "true" ]; then echo "-x"; else echo ""; fi)
 
 # Add extra options for debugging.
 SHELL := /usr/bin/env bash -ueo pipefail $(BASH_OPTIONS)
@@ -23,21 +22,30 @@ SHELL := /usr/bin/env bash -ueo pipefail $(BASH_OPTIONS)
 uname_s := $(shell uname -s)
 uname_m := $(shell uname -m)
 arch.x86_64 := amd64
-arch = $(arch.$(uname_m))
+arch.aarch64 := arm64
+arch.arm64 := arm64
+arch := $(arch.$(uname_m))
 kernel.Linux := linux
-kernel = $(kernel.$(uname_s))
+kernel.Darwin := darwin
+kernel := $(kernel.$(uname_s))
 
-OUTPUT_FORMAT ?= $(shell if [ "${GITHUB_ACTIONS}" == "true" ]; then echo "github"; else echo ""; fi)
-REPO_ROOT = $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-REPO_NAME = $(shell basename "$(REPO_ROOT)")
+OUTPUT_FORMAT ?= $(shell if [ "$(GITHUB_ACTIONS)" == "true" ]; then echo "github"; else echo ""; fi)
+REPO_ROOT := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+REPO_NAME := $(shell basename "$(REPO_ROOT)")
 
 # renovate: datasource=github-releases depName=aquaproj/aqua versioning=loose
-AQUA_VERSION ?= v2.53.9
-AQUA_REPO ?= github.com/aquaproj/aqua
-AQUA_CHECKSUM.Linux.x86_64 = 697d8e69bda13f30bb8d9f76ee5eeb67004cba93022148a20e7ffff8f7edee29
-AQUA_CHECKSUM ?= $(AQUA_CHECKSUM.$(uname_s).$(uname_m))
-AQUA_URL = https://$(AQUA_REPO)/releases/download/$(AQUA_VERSION)/aqua_$(kernel)_$(arch).tar.gz
-AQUA_ROOT_DIR = $(REPO_ROOT)/.aqua
+AQUA_VERSION ?= v2.60.1
+AQUA_REPO := github.com/aquaproj/aqua
+AQUA_CHECKSUM ?= $(AQUA_CHECKSUM.$(kernel).$(arch))
+export AQUA_ROOT_DIR = $(REPO_ROOT)/.aqua
+
+# Ensure that aqua and aqua installed tools are in the PATH.
+export PATH := $(AQUA_ROOT_DIR)/bin:$(PATH)
+
+# We want GNU versions of tools so prefer them if present.
+GREP := $(shell command -v ggrep 2>/dev/null || command -v grep 2>/dev/null)
+AWK := $(shell command -v gawk 2>/dev/null || command -v awk 2>/dev/null)
+MKTEMP := $(shell command -v gmktemp 2>/dev/null || command -v mktemp 2>/dev/null)
 
 # The help command prints targets in groups. Help documentation in the Makefile
 # uses comments with double hash marks (##). Documentation is printed by the
@@ -55,18 +63,18 @@ AQUA_ROOT_DIR = $(REPO_ROOT)/.aqua
 help: ## Print all Makefile targets (this message).
 	@# bash \
 	echo "$(REPO_NAME) Makefile"; \
-	echo "Usage: make [COMMAND]"; \
+	echo "Usage: $(MAKE) [COMMAND]"; \
 	echo ""; \
 	normal=""; \
 	cyan=""; \
-	if command -v tput >/dev/null 3>&1; then \
+	if command -v tput >/dev/null 2>&1; then \
 		if [ -t 1 ]; then \
 			normal=$$(tput sgr0); \
 			cyan=$$(tput setaf 6); \
 		fi; \
 	fi; \
-	grep --no-filename -E '^([/a-z.A-Z0-9_%-]+:.*?|)##' $(MAKEFILE_LIST) | \
-		awk \
+	$(GREP) --no-filename -E '^([/a-z.A-Z0-9_%-]+:.*?|)##' $(MAKEFILE_LIST) | \
+		$(AWK) \
 			--assign=normal="$${normal}" \
 			--assign=cyan="$${cyan}" \
 			'BEGIN {FS = "(:.*?|)## ?"}; { \
@@ -79,15 +87,45 @@ help: ## Print all Makefile targets (this message).
 				} \
 			}'
 
-package-lock.json: package.json
+# Node.js setup
+#####################################################################
+
+package-lock.json: package.json $(AQUA_ROOT_DIR)/.installed
 	@# bash \
-	loglevel="silent"; \
+	loglevel="notice"; \
 	if [ -n "$(DEBUG_LOGGING)" ]; then \
 		loglevel="verbose"; \
 	fi; \
-	npm --loglevel="$${loglevel}" install --package-lock-only --no-audit --no-fund
+	# NOTE: npm install will happily ignore the fact that integrity hashes are \
+	# missing in the package-lock.json. We need to check for missing integrity \
+	# fields ourselves. If any are missing, then we need to regenerate the \
+	# package-lock.json from scratch. \
+	nointegrity=""; \
+	noresolved=""; \
+	if [ -f "$@" ]; then \
+		nointegrity=$$(jq '.packages | del(."") | .[] | select(has("integrity") | not)' < $@); \
+		noresolved=$$(jq '.packages | del(."") | .[] | select(has("resolved") | not)' < $@); \
+	fi; \
+	if [ ! -f "$@" ] || [ -n "$${nointegrity}" ] || [ -n "$${noresolved}" ]; then \
+		# NOTE: package-lock.json is removed to ensure that npm includes the \
+		# integrity field. npm install will not restore this field if \
+		# missing in an existing package-lock.json file. \
+		rm -f $@; \
+		# NOTE: We clean the node_modules directory to ensure that npm install \
+		#       will not desync between the package.json, package-lock.json \
+		#       and the node_modules directory. \
+		$(MAKE) clean-node-modules; \
+		npm --loglevel="$${loglevel}" install \
+			--no-audit \
+			--no-fund; \
+	else \
+		npm --loglevel="$${loglevel}" install \
+			--package-lock-only \
+			--no-audit \
+			--no-fund; \
+	fi
 
-node_modules/.installed: package-lock.json
+node_modules/.installed: package.json
 	@# bash \
 	loglevel="silent"; \
 	if [ -n "$(DEBUG_LOGGING)" ]; then \
@@ -97,124 +135,124 @@ node_modules/.installed: package-lock.json
 	npm --loglevel="$${loglevel}" audit signatures; \
 	touch $@
 
-.venv/bin/activate:
-	@# bash \
-	python -m venv .venv
+# Python setup
+#####################################################################
 
-.venv/.installed: requirements-dev.txt .venv/bin/activate
+.uv/venv/bin/activate:
 	@# bash \
-	./.venv/bin/pip install -r $< --require-hashes; \
+	mkdir -p .uv; \
+	python -m venv .uv/venv; \
 	touch $@
 
-.bin/aqua-$(AQUA_VERSION)/aqua:
+.uv/.installed: requirements-dev.txt .uv/venv/bin/activate
 	@# bash \
-	mkdir -p .bin/aqua-$(AQUA_VERSION); \
-	tempfile=$$(mktemp --suffix=".aqua-$(AQUA_VERSION).tar.gz"); \
-	curl -sSLo "$${tempfile}" "$(AQUA_URL)"; \
-	echo "$(AQUA_CHECKSUM)  $${tempfile}" | sha256sum -c; \
-	tar -x -C .bin/aqua-$(AQUA_VERSION) -f "$${tempfile}"
+	./.uv/venv/bin/pip install -r $< --require-hashes; \
+	touch $@
 
-$(AQUA_ROOT_DIR)/.installed: .aqua.yaml .bin/aqua-$(AQUA_VERSION)/aqua
+uv.lock: pyproject.toml .uv/.installed
+	@# bash \
+	./.uv/venv/bin/uv lock; \
+	touch $@
+
+.venv/.installed: pyproject.toml .uv/.installed
+	@# bash \
+	./.uv/venv/bin/uv sync --locked; \
+	touch $@
+
+# Aqua setup
+#####################################################################
+
+$(AQUA_ROOT_DIR)/.$(AQUA_VERSION).installed:
+	@# bash \
+	./third_party/aquaproj/aqua-installer/aqua-installer -v "$(AQUA_VERSION)"; \
+	touch $@
+
+.aqua-checksums.json: .aqua.yaml $(AQUA_ROOT_DIR)/.$(AQUA_VERSION).installed
 	@# bash \
 	loglevel="info"; \
 	if [ -n "$(DEBUG_LOGGING)" ]; then \
 		loglevel="debug"; \
 	fi; \
-	AQUA_ROOT_DIR="$(AQUA_ROOT_DIR)" ./.bin/aqua-$(AQUA_VERSION)/aqua \
+	$(AQUA_ROOT_DIR)/bin/aqua \
+		--config ".aqua.yaml" \
 		--log-level "$${loglevel}" \
-		--config .aqua.yaml \
+		update-checksum \
+		--prune
+
+$(AQUA_ROOT_DIR)/.installed: .aqua.yaml $(AQUA_ROOT_DIR)/.$(AQUA_VERSION).installed
+	@# bash \
+	loglevel="info"; \
+	if [ -n "$(DEBUG_LOGGING)" ]; then \
+		loglevel="debug"; \
+	fi; \
+	$(AQUA_ROOT_DIR)/bin/aqua \
+		--config ".aqua.yaml" \
+		--log-level "$${loglevel}" \
 		install; \
 	touch $@
 
 ## Build
 #####################################################################
 
-.PHONY: compile
-compile: node_modules/.installed ## Compile TypeScript.
-	@rm -rf lib
-	@./node_modules/.bin/tsc -p ./tsconfig.json
+.PHONY: all
+all: test pack ## Build everything.
+
+.PHONY: build
+build: node_modules/.installed ## Build the project.
+	@# bash \
+	rm -rf lib; \
+	./node_modules/.bin/tsc
 
 .PHONY: package
-package: compile ## Builds the distribution package.
-	@rm -rf dist
-	@npx rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript
+package: build ## Builds the distribution package.
+	@# bash \
+	rm -rf dist; \
+	npx rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript
 
 ## Testing
 #####################################################################
 
+.PHONY: test
+test: lint unit-test ## Run all tests.
+
 .PHONY: unit-test
-unit-test: compile ## Runs all unit tests.
-	# NOTE: Make sure the package builds.
-	@NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 \
-		./node_modules/.bin/jest --coverage
-
-## Tools
-#####################################################################
-
-.PHONY: license-headers
-license-headers: ## Update license headers.
+unit-test: build ## Runs all unit tests.
 	@# bash \
-	files=$$( \
-		git ls-files --deduplicate \
-			'*.c' \
-			'*.cpp' \
-			'*.go' \
-			'*.h' \
-			'*.hpp' \
-			'*.js' \
-			'*.lua' \
-			'*.py' \
-			'*.rb' \
-			'*.rs' \
-			'*.toml' \
-			'*.yaml' \
-			'*.yml' \
-			':!:dist/' \
-			'Makefile' \
-			| while IFS='' read -r f; do [ -f "$${f}" ] && echo "$${f}" || true; done \
-	); \
-	name=$$(git config user.name); \
-	if [ "$${name}" == "" ]; then \
-		>&2 echo "git user.name is required."; \
-		>&2 echo "Set it up using:"; \
-		>&2 echo "git config user.name \"John Doe\""; \
-	fi; \
-	for filename in $${files}; do \
-		if ! ( head "$${filename}" | grep -iL "Copyright" > /dev/null ); then \
-			./third_party/mbrukman/autogen/autogen.sh \
-				--in-place \
-				--no-code \
-				--no-tlc \
-				--copyright "$${name}" \
-				--license apache \
-				"$${filename}"; \
-		fi; \
-	done
+	# NOTE: Make sure the package builds. \
+	NODE_OPTIONS=--experimental-vm-modules \
+	NODE_NO_WARNINGS=1 \
+		./node_modules/.bin/jest --coverage
 
 ## Formatting
 #####################################################################
 
 .PHONY: format
-format: js-format json-format md-format ts-format yaml-format ## Format all files
+format: js-format json-format license-headers md-format ts-format yaml-format ## Format all files
 
 .PHONY: js-format
 js-format: node_modules/.installed ## Format YAML files.
-	@set -euo pipefail; \
-		files=$$( \
-			git ls-files --deduplicate \
-				'*.js' \
-				'*.cjs' \
-				'*.mjs' \
-				'*.jsx' \
-				'*.mjsx' \
-				':!:dist/' \
-		); \
-		if [ "$${files}" == "" ]; then \
-			exit 0; \
-		fi; \
-		./node_modules/.bin/prettier \
-			--write \
-			$${files}
+	@# bash \
+	loglevel="log"; \
+	if [ -n "$(DEBUG_LOGGING)" ]; then \
+		loglevel="debug"; \
+	fi; \
+	files=$$( \
+		git ls-files --deduplicate \
+			'*.js' \
+			'*.cjs' \
+			'*.mjs' \
+			'*.jsx' \
+			'*.mjsx' \
+			':!:dist/' \
+	); \
+	if [ "$${files}" == "" ]; then \
+		exit 0; \
+	fi; \
+	./node_modules/.bin/prettier \
+		--log-level "$${loglevel}" \
+		--no-error-on-unmatched-pattern \
+		--write \
+		$${files}
 
 .PHONY: json-format
 json-format: node_modules/.installed ## Format JSON files.
@@ -237,6 +275,46 @@ json-format: node_modules/.installed ## Format JSON files.
 		--no-error-on-unmatched-pattern \
 		--write \
 		$${files}
+
+.PHONY: license-headers
+license-headers: ## Update license headers.
+	@# bash \
+	files=$$( \
+		git ls-files --deduplicate \
+			'*.c' \
+			'*.cpp' \
+			'*.go' \
+			'*.h' \
+			'*.hpp' \
+			'*.js' \
+			'*.lua' \
+			'*.py' \
+			'*.rb' \
+			'*.rs' \
+			'*.yaml' \
+			'*.yml' \
+			'Makefile' \
+			':!:dist/' \
+			| while IFS='' read -r f; do [ -f "$${f}" ] && echo "$${f}" || true; done \
+	); \
+	name=$$(git config user.name); \
+	if [ "$${name}" == "" ]; then \
+		>&2 echo "git user.name is required."; \
+		>&2 echo "Set it up using:"; \
+		>&2 echo "git config user.name \"John Doe\""; \
+		exit 1; \
+	fi; \
+	for filename in $${files}; do \
+		if ! ( head "$${filename}" | $(GREP) -iL "Copyright" > /dev/null ); then \
+			./third_party/mbrukman/autogen/autogen.sh \
+				--in-place \
+				--no-code \
+				--no-tlc \
+				--copyright "$${name}" \
+				--license apache \
+				"$${filename}"; \
+		fi; \
+	done
 
 .PHONY: md-format
 md-format: node_modules/.installed ## Format Markdown files.
@@ -310,7 +388,7 @@ ts-format: node_modules/.installed ## Format YAML files.
 #####################################################################
 
 .PHONY: lint
-lint: actionlint commitlint eslint fixme markdownlint renovate-config-validator textlint yamllint zizmor ## Run all linters.
+lint: actionlint checkmake commitlint eslint fixme format-check markdownlint renovate-config-validator textlint yamllint zizmor ## Run all linters.
 
 .PHONY: actionlint
 actionlint: $(AQUA_ROOT_DIR)/.installed ## Runs the actionlint linter.
@@ -325,15 +403,35 @@ actionlint: $(AQUA_ROOT_DIR)/.installed ## Runs the actionlint linter.
 	if [ "$${files}" == "" ]; then \
 		exit 0; \
 	fi; \
-	PATH="$(REPO_ROOT)/.bin/aqua-$(AQUA_VERSION):$(AQUA_ROOT_DIR)/bin:$${PATH}"; \
-	AQUA_ROOT_DIR="$(AQUA_ROOT_DIR)"; \
 	if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
 		actionlint \
 			-format '{{range $$err := .}}::error file={{$$err.Filepath}},line={{$$err.Line}},col={{$$err.Column}}::{{$$err.Message}}%0A```%0A{{replace $$err.Snippet "\\n" "%0A"}}%0A```\n{{end}}' \
 			-ignore 'SC2016:' \
 			$${files}; \
 	else \
-		actionlint $${files}; \
+		actionlint \
+			-ignore 'SC2016:' \
+			$${files}; \
+	fi
+
+.PHONY: checkmake
+checkmake: $(AQUA_ROOT_DIR)/.installed ## Runs the checkmake linter.
+	@# bash \
+	# NOTE: We need to ignore config files used in tests. \
+	files=$$( \
+		git ls-files --deduplicate \
+			'Makefile' \
+			| while IFS='' read -r f; do [ -f "$${f}" ] && echo "$${f}" || true; done \
+	); \
+	if [ "$${files}" == "" ]; then \
+		exit 0; \
+	fi; \
+	if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
+		checkmake \
+			--format '::error file={{.FileName}},line={{.LineNumber}}::{{.Rule}}: {{.Violation}}' \
+			$${files}; \
+	else \
+		checkmake $${files}; \
 	fi
 
 .PHONY: commitlint
@@ -342,19 +440,25 @@ commitlint: node_modules/.installed ## Run commitlint linter.
 	commitlint_from=$(COMMITLINT_FROM_REF); \
 	commitlint_to=$(COMMITLINT_TO_REF); \
 	if [ "$${commitlint_from}" == "" ]; then \
-		commitlint_from=$$(git remote show origin | grep 'HEAD branch' | awk '{print $$NF}'); \
+		# Try to get the default branch without hitting the remote server \
+		if git symbolic-ref --short refs/remotes/origin/HEAD >/dev/null 2>&1; then \
+			commitlint_from=$$(git symbolic-ref --short refs/remotes/origin/HEAD); \
+		elif git show-ref refs/remotes/origin/master >/dev/null 2>&1; then \
+			commitlint_from="origin/master"; \
+		else \
+			commitlint_from="origin/main"; \
+		fi; \
 	fi; \
 	if [ "$${commitlint_to}" == "" ]; then \
-		# if head is on the commitlint_from branch, then we will lint the \
-		# last commit by default. \
-		current_branch=$$(git rev-parse --abbrev-ref HEAD); \
+		# If upstream of HEAD is on the commitlint_from branch, then we will \
+		# lint the last commit by default. \
+		current_branch=$$(git rev-parse --abbrev-ref @{u}); \
 		if [ "$${commitlint_from}" == "$${current_branch}" ]; then \
-			commintlint_from="HEAD~1"; \
+			commitlint_from="HEAD~1"; \
 		fi; \
 		commitlint_to="HEAD"; \
 	fi; \
 	./node_modules/.bin/commitlint \
-		--config commitlint.config.mjs \
 		--from "$${commitlint_from}" \
 		--to "$${commitlint_to}" \
 		--verbose \
@@ -385,8 +489,6 @@ eslint: node_modules/.installed ## Runs eslint.
 	if [ "$${files}" == "" ]; then \
 		exit 0; \
 	fi; \
-	PATH="$(REPO_ROOT)/.bin/aqua-$(AQUA_VERSION):$(AQUA_ROOT_DIR)/bin:$${PATH}"; \
-	AQUA_ROOT_DIR="$(AQUA_ROOT_DIR)"; \
 	if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
 		exit_code=0; \
 		while IFS="" read -r p && [ -n "$${p}" ]; do \
@@ -424,8 +526,6 @@ eslint: node_modules/.installed ## Runs eslint.
 .PHONY: fixme
 fixme: $(AQUA_ROOT_DIR)/.installed ## Check for outstanding FIXMEs.
 	@# bash \
-	PATH="$(REPO_ROOT)/.bin/aqua-$(AQUA_VERSION):$(AQUA_ROOT_DIR)/bin:$${PATH}"; \
-	AQUA_ROOT_DIR="$(AQUA_ROOT_DIR)"; \
 	output="default"; \
 	if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
 		output="github"; \
@@ -437,6 +537,29 @@ fixme: $(AQUA_ROOT_DIR)/.installed ## Check for outstanding FIXMEs.
 		--output "$${output}" \
 		--todo-types="FIXME,Fixme,fixme,BUG,Bug,bug,XXX,COMBAK"
 
+.PHONY: format-check
+format-check: ## Check that files are properly formatted.
+	@# bash \
+	if [ -n "$$(git diff)" ]; then \
+		>&2 echo "The working directory is dirty. Please commit, stage, or stash changes and try again."; \
+		exit 1; \
+	fi; \
+	$(MAKE) format; \
+	exit_code=0; \
+	if [ -n "$$(git diff)" ]; then \
+		>&2 echo "Some files need to be formatted. Please run '$(MAKE) format' and try again."; \
+		if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
+			echo "::group::git diff"; \
+		fi; \
+		git --no-pager diff; \
+		if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
+			echo "::endgroup::"; \
+		fi; \
+		exit_code=1; \
+	fi; \
+	git restore .; \
+	exit "$${exit_code}"
+
 .PHONY: markdownlint
 markdownlint: node_modules/.installed $(AQUA_ROOT_DIR)/.installed ## Runs the markdownlint linter.
 	@# bash \
@@ -446,67 +569,18 @@ markdownlint: node_modules/.installed $(AQUA_ROOT_DIR)/.installed ## Runs the ma
 	files=$$( \
 		git ls-files --deduplicate \
 			'*.md' \
-			':!:.github/pull_request_template.md' \
-			':!:.github/ISSUE_TEMPLATE/*.md' \
 			| while IFS='' read -r f; do [ -f "$${f}" ] && echo "$${f}" || true; done \
 	); \
 	if [ "$${files}" == "" ]; then \
 		exit 0; \
 	fi; \
-	PATH="$(REPO_ROOT)/.bin/aqua-$(AQUA_VERSION):$(AQUA_ROOT_DIR)/bin:$${PATH}"; \
-	AQUA_ROOT_DIR="$(AQUA_ROOT_DIR)"; \
-	if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
-		exit_code=0; \
-		while IFS="" read -r p && [ -n "$$p" ]; do \
-			file=$$(echo "$$p" | jq -cr '.fileName // empty'); \
-			line=$$(echo "$$p" | jq -cr '.lineNumber // empty'); \
-			endline=$${line}; \
-			message=$$(echo "$$p" | jq -cr '.ruleNames[0] + "/" + .ruleNames[1] + " " + .ruleDescription + " [Detail: \"" + .errorDetail + "\", Context: \"" + .errorContext + "\"]"'); \
-			exit_code=1; \
-			echo "::error file=$${file},line=$${line},endLine=$${endline}::$${message}"; \
-		done <<< "$$(./node_modules/.bin/markdownlint --config .markdownlint.yaml --dot --json $${files} 2>&1 | jq -c '.[]')"; \
-		if [ "$${exit_code}" != "0" ]; then \
-			exit "$${exit_code}"; \
-		fi; \
-	else \
-		./node_modules/.bin/markdownlint \
-			--config .markdownlint.yaml \
-			--dot \
-			$${files}; \
-	fi; \
-	files=$$( \
-		git ls-files --deduplicate \
-			'.github/pull_request_template.md' \
-			'.github/ISSUE_TEMPLATE/*.md' \
-			| while IFS='' read -r f; do [ -f "$${f}" ] && echo "$${f}" || true; done \
-	); \
-	if [ "$${files}" == "" ]; then \
-		exit 0; \
-	fi; \
-	if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
-		exit_code=0; \
-		while IFS="" read -r p && [ -n "$$p" ]; do \
-			file=$$(echo "$$p" | jq -cr '.fileName // empty'); \
-			line=$$(echo "$$p" | jq -cr '.lineNumber // empty'); \
-			endline=$${line}; \
-			message=$$(echo "$$p" | jq -cr '.ruleNames[0] + "/" + .ruleNames[1] + " " + .ruleDescription + " [Detail: \"" + .errorDetail + "\", Context: \"" + .errorContext + "\"]"'); \
-			exit_code=1; \
-			echo "::error file=$${file},line=$${line},endLine=$${endline}::$${message}"; \
-		done <<< "$$(./node_modules/.bin/markdownlint --config .github/template.markdownlint.yaml --dot --json $${files} 2>&1 | jq -c '.[]')"; \
-		if [ "$${exit_code}" != "0" ]; then \
-			exit "$${exit_code}"; \
-		fi; \
-	else \
-		./node_modules/.bin/markdownlint \
-			--config .github/template.markdownlint.yaml \
-			--dot \
-			$${files}; \
-	fi
+	./node_modules/.bin/markdownlint-cli2 $${files}
 
 .PHONY: renovate-config-validator
 renovate-config-validator: node_modules/.installed ## Validate Renovate configuration.
 	@# bash \
-	./node_modules/.bin/renovate-config-validator --strict
+	./node_modules/.bin/renovate-config-validator \
+		--strict
 
 .PHONY: textlint
 textlint: node_modules/.installed $(AQUA_ROOT_DIR)/.installed ## Runs the textlint linter.
@@ -521,29 +595,7 @@ textlint: node_modules/.installed $(AQUA_ROOT_DIR)/.installed ## Runs the textli
 	if [ "$${files}" == "" ]; then \
 		exit 0; \
 	fi; \
-	PATH="$(REPO_ROOT)/.bin/aqua-$(AQUA_VERSION):$(AQUA_ROOT_DIR)/bin:$${PATH}"; \
-	AQUA_ROOT_DIR="$(AQUA_ROOT_DIR)"; \
-	if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
-		exit_code=0; \
-		while IFS="" read -r p && [ -n "$$p" ]; do \
-			filePath=$$(echo "$$p" | jq -cr '.filePath // empty'); \
-			file=$$(realpath --relative-to="." "$${filePath}"); \
-			while IFS="" read -r m && [ -n "$$m" ]; do \
-				line=$$(echo "$$m" | jq -cr '.loc.start.line // empty'); \
-				endline=$$(echo "$$m" | jq -cr '.loc.end.line // empty'); \
-				col=$$(echo "$${m}" | jq -cr '.loc.start.column // empty'); \
-				endcol=$$(echo "$${m}" | jq -cr '.loc.end.column // empty'); \
-				message=$$(echo "$$m" | jq -cr '.message // empty'); \
-				exit_code=1; \
-				echo "::error file=$${file},line=$${line},endLine=$${endline},col=$${col},endColumn=$${endcol}::$${message}"; \
-			done <<<"$$(echo "$$p" | jq -cr '.messages[] // empty')"; \
-		done <<< "$$(./node_modules/.bin/textlint -c .textlintrc.yaml --format json $${files} 2>&1 | jq -c '.[]')"; \
-		exit "$${exit_code}"; \
-	else \
-		./node_modules/.bin/textlint \
-			--config .textlintrc.yaml \
-			$${files}; \
-	fi
+	./node_modules/.bin/textlint $${files}
 
 .PHONY: yamllint
 yamllint: .venv/.installed ## Runs the yamllint linter.
@@ -561,9 +613,8 @@ yamllint: .venv/.installed ## Runs the yamllint linter.
 	if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
 		format="github"; \
 	fi; \
-	.venv/bin/yamllint \
+	./.venv/bin/yamllint \
 		--strict \
-		--config-file .yamllint.yaml \
 		--format "$${format}" \
 		$${files}
 
@@ -582,15 +633,13 @@ zizmor: .venv/.installed ## Runs the zizmor linter.
 		exit 0; \
 	fi; \
 	if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
-		.venv/bin/zizmor \
-			--config .zizmor.yml \
+		./.venv/bin/zizmor \
 			--quiet \
 			--pedantic \
 			--format sarif \
 			$${files} > zizmor.sarif.json; \
 	fi; \
-	.venv/bin/zizmor \
-		--config .zizmor.yml \
+	./.venv/bin/zizmor \
 		--quiet \
 		--pedantic \
 		--format plain \
@@ -599,11 +648,12 @@ zizmor: .venv/.installed ## Runs the zizmor linter.
 ## Maintenance
 #####################################################################
 
+.PHONY: update-lockfiles
+update-lockfiles: .aqua-checksums.json package-lock.json uv.lock ## Update lockfiles.
+
 .PHONY: todos
 todos: $(AQUA_ROOT_DIR)/.installed ## Print outstanding TODOs.
 	@# bash \
-	PATH="$(REPO_ROOT)/.bin/aqua-$(AQUA_VERSION):$(AQUA_ROOT_DIR)/bin:$${PATH}"; \
-	AQUA_ROOT_DIR="$(AQUA_ROOT_DIR)"; \
 	output="default"; \
 	if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
 		output="github"; \
@@ -615,14 +665,16 @@ todos: $(AQUA_ROOT_DIR)/.installed ## Print outstanding TODOs.
 		--output "$${output}" \
 		--todo-types="TODO,Todo,todo,FIXME,Fixme,fixme,BUG,Bug,bug,XXX,COMBAK"
 
+.PHONY: clean-node-modules
+clean-node-modules:
+	@$(RM) -r node_modules
+
 .PHONY: clean
-clean: ## Delete temporary files.
-	@# bash \
-	rm -rf \
-		.bin \
-		$(AQUA_ROOT_DIR) \
-		.venv \
-		node_modules \
-		*.sarif.json \
-		lib \
-		coverage
+clean: clean-node-modules ## Delete temporary files.
+	@$(RM) -r .bin
+	@$(RM) -r $(AQUA_ROOT_DIR)
+	@$(RM) -r .venv
+	@$(RM) -r .uv
+	@$(RM) *.sarif.json
+	@$(RM) -r lib
+	@$(RM) -r coverage

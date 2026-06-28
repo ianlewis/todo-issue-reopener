@@ -6,6 +6,7 @@
     "declarationMap": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true, // isolatedModules is required by jest-ts
     "lib": [
       "ES2022",
       "DOM" // NOTE: DOM is only required to avoid errors with some transitive dependencies.
