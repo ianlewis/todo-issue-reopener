@@ -65,6 +65,17 @@
   // issues is more intuitive.
   configWarningReuseIssue: false,
 
+  // Add custom manager to update versions embedded in TypeScript source files.
+  customManagers: [
+    {
+      customType: "regex",
+      managerFilePatterns: ["**/*.ts"],
+      matchStrings: [
+        "// renovate: datasource=(?<datasource>[a-zA-Z0-9-._]+?) depName=(?<depName>[^\\s]+?)(?: (?:packageName)=(?<packageName>[^\\s]+?))?(?: versioning=(?<versioning>[^\\s]+?))?(?: extractVersion=(?<extractVersion>[^\\s]+?))?(?: registryUrl=(?<registryUrl>[^\\s]+?))?\\s+const\\s+[A-Za-z0-9_]+?_VERSION\\s*=\\s*[\"'](?<currentValue>[^\"']?)[\"'];\\s",
+      ],
+    },
+  ],
+
   // Group various ecosystem updates. Security updates are always separate.
   packageRules: [
     {
