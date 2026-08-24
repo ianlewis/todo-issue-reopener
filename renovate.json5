@@ -108,6 +108,7 @@
     {
       matchManagers: ["npm"],
       matchDepTypes: ["devDependencies"],
+      matchUpdateTypes: ["minor", "patch"],
       groupName: "npm dev",
     },
   ],
