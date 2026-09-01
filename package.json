@@ -65,7 +65,7 @@
     "textlint-rule-spelling": "0.3.0",
     "ts-jest": "29.4.11",
     "ts-jest-resolver": "2.0.1",
-    "typescript": "5.9.3",
+    "typescript": "7.0.2",
     "encoding": "0.1.13",
     "picomatch": "4.0.4"
   }
