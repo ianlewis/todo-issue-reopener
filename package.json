@@ -57,7 +57,7 @@
     "jest": "30.4.2",
     "markdownlint-cli2": "0.22.1",
     "prettier": "3.8.4",
-    "prettier-eslint": "16.4.2",
+    "prettier-eslint": "17.1.2",
     "renovate": "42.99.0",
     "rollup": "4.62.2",
     "textlint": "15.7.1",
